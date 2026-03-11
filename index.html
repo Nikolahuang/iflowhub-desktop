@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function () {
+        var t = localStorage.getItem('iflow-theme');
+        if (t === 'light') document.documentElement.classList.add('theme-light');
+        else if (t === 'dark') document.documentElement.classList.add('theme-dark');
+      })();
+    </script>
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>flow hub</title>
+  </head>
+  <body>
+    <div id="app">
+      <!-- 侧边栏：Agent 列表 -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1>flow hub</h1>
+          <button id="add-agent-btn" class="btn-primary">+ 添加 Agent</button>
+        </div>
+        <div class="agent-list" id="agent-list">
+          <!-- Agent 列表将在这里动态生成 -->
+        </div>
+        <div class="session-section">
+          <div class="session-section-title">会话历史</div>
+          <div class="session-list" id="session-list">
+            <div class="session-empty">选择 Agent 后显示会话历史</div>
+          </div>
+        </div>
+        <div class="sidebar-footer">
+          <div class="connection-status" id="connection-status">
+            <span class="status-dot disconnected"></span>
+            <span>未连接</span>
+          </div>
+          <div class="sidebar-footer-actions">
+            <button id="clear-all-sessions" class="btn-text">清除当前 Agent 会话</button>
+            <div id="app-version" class="app-version-inline">v--</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 主内容区 -->
+      <main class="main-content">
+        <!-- 顶部工具栏 -->
+        <header class="toolbar">
+          <div class="current-agent">
+            <h2 id="current-agent-name">选择一个 Agent</h2>
+            <span id="current-agent-status" class="badge">离线</span>
+            <div class="model-selector">
+              <button
+                id="current-agent-model-btn"
+                class="model-selector-btn"
+                type="button"
+                disabled
+                aria-expanded="false"
+              >
+                <span id="current-agent-model-text">模型：未连接</span>
+                <span class="model-selector-caret">▾</span>
+              </button>
+              <div id="current-agent-model-menu" class="model-selector-menu hidden"></div>
+            </div>
+          </div>
+          <div class="toolbar-actions">
+            <button id="new-session-btn" class="btn-primary" disabled title="开启新会话，清除 iFlow 历史上下文">➕ 新会话</button>
+            <button id="open-mcp-market-btn" class="btn-secondary" type="button" aria-label="打开 MCP 市场" disabled>🛒 MCP 市场</button>
+            <button id="open-agent-market-btn" class="btn-secondary" type="button" aria-label="打开 Agent 市场" disabled>🤖 Agent 市场</button>
+            <button id="open-templates-btn" class="btn-secondary" type="button" aria-label="打开模板库">📚 模板库</button>
+            <button id="open-favorites-btn" class="btn-secondary" type="button" aria-label="打开收藏夹">⭐ 收藏夹</button>
+            <button id="open-branch-btn" class="btn-secondary" type="button" aria-label="打开对话分支">🌳 分支</button>
+            <button id="export-session-btn" class="btn-secondary" type="button" aria-label="导出会话" disabled>📤 导出</button>
+            <button id="open-settings-btn" class="btn-secondary" type="button" aria-label="打开设置">设置</button>
+            <button id="toggle-think-btn" class="btn-secondary think-toggle-btn" aria-label="切换思考模式" disabled>思考：关</button>
+            <button id="open-tool-calls-btn" class="btn-secondary" aria-label="打开工具调用面板">工具调用</button>
+            <button id="open-git-changes-btn" class="btn-secondary" aria-label="打开文件变更面板">文件变更</button>
+            <button id="clear-chat-btn" class="btn-secondary" disabled>清空当前会话</button>
+          </div>
+        </header>
+
+        <!-- 对话区域 -->
+        <div class="chat-container">
+          <div id="chat-messages" class="chat-messages">
+            <div class="welcome-message">
+              <h3>👋 欢迎使用 flow hub</h3>
+              <p>从左侧选择一个 Agent 开始对话，或添加新的 Agent。</p>
+            </div>
+          </div>
+
+          <!-- 工具调用面板 -->
+          <div id="tool-calls-panel" class="tool-calls-panel hidden">
+            <div class="tool-calls-header">
+              <h4>🔧 工具调用</h4>
+              <button id="close-tool-panel" class="btn-icon" aria-label="关闭工具调用面板">×</button>
+            </div>
+            <div id="tool-calls-list" class="tool-calls-list">
+              <!-- 工具调用将在这里显示 -->
+            </div>
+          </div>
+
+          <div id="git-changes-panel" class="git-changes-panel hidden">
+            <div class="git-changes-header">
+              <div class="git-changes-title-row">
+                <h4>📝 文件变更</h4>
+                <span id="git-changes-refresh-time" class="git-changes-refresh-time">未刷新</span>
+              </div>
+              <div class="git-changes-actions">
+                <button id="refresh-git-changes" class="btn-icon" title="刷新文件变更" aria-label="刷新文件变更">↻</button>
+                <button id="close-git-panel" class="btn-icon" title="关闭文件变更" aria-label="关闭文件变更面板">×</button>
+              </div>
+            </div>
+            <div id="git-changes-list" class="git-changes-list">
+              <!-- 文件变更将在这里显示 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="input-container">
+          <div class="input-wrapper">
+            <div class="composer-pane">
+              <div id="slash-command-menu" class="slash-command-menu hidden"></div>
+              <textarea 
+                id="message-input" 
+                placeholder="输入消息..." 
+                rows="1"
+                disabled
+              ></textarea>
+            </div>
+            <button id="send-btn" class="btn-send" disabled>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+          <div class="input-hints">
+            <span id="input-status-hint">按 Enter 发送，Shift + Enter 换行</span>
+            <span id="context-length-hint" class="context-length-hint"></span>
+            <span id="char-counter" class="char-counter"></span>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- 添加 Agent 弹窗 -->
+    <div id="add-agent-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>添加 iFlow Agent</h3>
+          <button id="close-modal" class="btn-icon">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="agent-name">Agent 名称</label>
+            <input type="text" id="agent-name" placeholder="我的 iFlow" value="iFlow">
+          </div>
+          <div class="form-group">
+            <label for="iflow-path">iFlow CLI 路径（可选）</label>
+            <input type="text" id="iflow-path" placeholder="iflow（使用系统 PATH）">
+          </div>
+          <div class="form-group">
+            <label for="workspace-path">工作目录</label>
+            <div class="workspace-path-row">
+              <input type="text" id="workspace-path" placeholder="/path/to/workspace" value="/Users/chenweilong/playground">
+              <button id="browse-workspace-path" class="btn-secondary btn-compact" type="button">选择文件夹</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-add-agent" class="btn-secondary">取消</button>
+          <button id="confirm-add-agent" class="btn-primary">连接</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 编辑 Agent 名称弹窗 -->
+    <div id="rename-agent-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>编辑 Agent 名称</h3>
+          <button id="close-rename-agent-modal" class="btn-icon">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="rename-agent-name">Agent 名称</label>
+            <input type="text" id="rename-agent-name" placeholder="请输入 Agent 名称">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-rename-agent" class="btn-secondary">取消</button>
+          <button id="confirm-rename-agent" class="btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 重命名会话弹窗 -->
+    <div id="rename-session-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>重命名会话</h3>
+          <button id="close-rename-session-modal" class="btn-icon">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="rename-session-title">会话名称</label>
+            <input type="text" id="rename-session-title" placeholder="请输入会话名称" maxlength="100">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-rename-session" class="btn-secondary">取消</button>
+          <button id="confirm-rename-session" class="btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content settings-modal-content">
+        <div class="modal-header">
+          <h3>设置</h3>
+          <button id="close-settings-modal" class="btn-icon" aria-label="关闭设置">×</button>
+        </div>
+        <div class="modal-body settings-modal-body">
+          <div class="settings-group">
+            <div class="settings-group-title">权限模式</div>
+            <div class="permission-mode-selector" id="permission-mode-selector">
+              <button class="permission-mode-btn" data-mode="yolo" type="button">
+                <span class="permission-mode-icon">🚀</span>
+                <span class="permission-mode-name">YOLO</span>
+                <span class="permission-mode-desc">自动执行所有操作</span>
+              </button>
+              <button class="permission-mode-btn active" data-mode="smart" type="button">
+                <span class="permission-mode-icon">🧠</span>
+                <span class="permission-mode-name">智能</span>
+                <span class="permission-mode-desc">读操作自动，写操作确认</span>
+              </button>
+              <button class="permission-mode-btn" data-mode="confirm" type="button">
+                <span class="permission-mode-icon">🔒</span>
+                <span class="permission-mode-name">确认</span>
+                <span class="permission-mode-desc">所有操作都需要确认</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">主题强调色</div>
+            <div class="accent-color-picker" id="accent-color-picker">
+              <!-- 动态生成 -->
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">字体风格</div>
+            <div class="font-selector" id="font-selector">
+              <!-- 动态生成 -->
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">刷新后重连</div>
+            <div class="auto-reconnect-control">
+              <span class="auto-reconnect-label">重连方式</span>
+              <select
+                id="auto-reconnect-mode-select"
+                class="auto-reconnect-select"
+                aria-label="自动重连模式"
+                title="刷新后重连方式"
+              >
+                <option value="last">最后一个</option>
+                <option value="all">全部</option>
+                <option value="off">关闭</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">消息超时</div>
+            <div class="timeout-control">
+              <span class="timeout-label">等待响应时间</span>
+              <select
+                id="message-timeout-select"
+                class="timeout-select"
+                aria-label="消息超时时间"
+                title="等待 AI 响应的超时时间"
+              >
+                <option value="0">无限等待</option>
+                <option value="60000">1 分钟</option>
+                <option value="180000">3 分钟</option>
+                <option value="300000">5 分钟</option>
+                <option value="600000">10 分钟</option>
+                <option value="1800000">30 分钟</option>
+              </select>
+            </div>
+            <div class="timeout-hint">复杂任务建议选择"无限等待"或更长时间</div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">对话模式</div>
+            <div class="mode-selector" id="mode-selector">
+              <button class="mode-btn active" data-mode="conversation" type="button">
+                <span class="mode-icon">💬</span>
+                <span class="mode-name">对话模式</span>
+                <span class="mode-desc">保留历史上下文，连续对话</span>
+              </button>
+              <button class="mode-btn" data-mode="cli" type="button">
+                <span class="mode-icon">⚡</span>
+                <span class="mode-name">CLI 模式</span>
+                <span class="mode-desc">每次独立请求，无历史累积</span>
+              </button>
+            </div>
+            <div class="mode-hint">CLI 模式类似命令行体验，避免 "Prompt 超长" 错误</div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">智能记忆管理</div>
+            <div class="memory-controls">
+              <div class="memory-stats" id="memory-stats">
+                <!-- 动态填充 -->
+              </div>
+              <div class="memory-actions">
+                <button id="clear-memory-btn" class="btn-secondary btn-small" type="button">
+                  清除所有记忆
+                </button>
+                <button id="export-memory-btn" class="btn-secondary btn-small" type="button">
+                  导出记忆
+                </button>
+              </div>
+            </div>
+            <div class="memory-hint">
+              记忆系统会自动存储对话关键信息，长文本查询时自动检索相关上下文
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">提醒</div>
+            <div class="notification-controls settings-notification-controls">
+              <div class="notification-delay-group" aria-label="提醒延迟">
+                <span class="notification-delay-label">延迟</span>
+                <input
+                  id="notification-delay-minute"
+                  class="notification-delay-input"
+                  type="number"
+                  min="0"
+                  max="59"
+                  step="1"
+                  inputmode="numeric"
+                  title="提醒延迟分钟"
+                  aria-label="提醒延迟分钟"
+                />
+                <span class="notification-delay-unit">分</span>
+                <input
+                  id="notification-delay-second"
+                  class="notification-delay-input"
+                  type="number"
+                  min="0"
+                  max="59"
+                  step="1"
+                  inputmode="numeric"
+                  title="提醒延迟秒"
+                  aria-label="提醒延迟秒"
+                />
+                <span class="notification-delay-unit">秒</span>
+              </div>
+              <select
+                id="notification-sound-select"
+                class="notification-sound-select"
+                aria-label="对话完成提示音"
+                title="对话完成提示音"
+              ></select>
+              <button
+                id="notification-sound-upload-btn"
+                class="btn-secondary btn-compact notification-upload-btn"
+                type="button"
+              >
+                上传铃声
+              </button>
+              <input
+                id="notification-sound-upload-input"
+                type="file"
+                accept="audio/*"
+                class="hidden-file-input"
+              />
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">外观</div>
+            <button id="theme-toggle-btn" class="btn-secondary settings-theme-btn" title="跟随系统" aria-label="切换主题">主题：◑</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="close-settings-footer-btn" class="btn-primary">完成</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HTML Artifact 预览弹窗 -->
+    <div id="artifact-preview-modal" class="modal hidden">
+      <div class="modal-content artifact-preview-modal-content">
+        <div class="modal-header">
+          <h3>HTML 预览</h3>
+          <button id="close-artifact-preview" class="btn-icon">×</button>
+        </div>
+        <div class="modal-body artifact-preview-meta">
+          <div id="artifact-preview-path"></div>
+        </div>
+        <div class="artifact-preview-body">
+          <iframe
+            id="artifact-preview-frame"
+            class="artifact-preview-frame"
+            sandbox="allow-scripts allow-same-origin"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Git Diff 预览弹窗 -->
+    <div id="git-diff-modal" class="modal hidden">
+      <div class="modal-content git-diff-modal-content">
+        <div class="modal-header">
+          <h3 class="git-diff-title">文件 <span id="git-diff-path"></span> Diff</h3>
+          <button id="close-git-diff" class="btn-icon" aria-label="关闭 Diff 预览">×</button>
+        </div>
+        <div class="git-diff-body">
+          <pre id="git-diff-content" class="git-diff-content" role="region" aria-label="文件 Diff 内容"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prompt 模板库弹窗 -->
+    <div id="templates-modal" class="modal hidden">
+      <div class="modal-content templates-modal-content">
+        <div class="modal-header">
+          <h3>📚 Prompt 模板库</h3>
+          <button id="close-templates-modal" class="btn-icon" aria-label="关闭模板库">×</button>
+        </div>
+        <div class="templates-toolbar">
+          <input type="text" id="template-search" class="template-search-input" placeholder="搜索模板..." />
+          <button id="add-template-btn" class="btn-primary btn-compact" type="button">+ 新建模板</button>
+        </div>
+        <div class="modal-body templates-modal-body">
+          <div id="templates-list" class="templates-list">
+            <!-- 模板列表将在这里动态生成 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模板变量输入弹窗 -->
+    <div id="template-variables-modal" class="modal hidden">
+      <div class="modal-content template-variables-modal-content">
+        <div class="modal-header">
+          <h3 id="template-variables-title">填写模板变量</h3>
+          <button id="close-template-variables-modal" class="btn-icon" aria-label="关闭">×</button>
+        </div>
+        <div class="modal-body" id="template-variables-body">
+          <!-- 变量表单将在这里动态生成 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 导出会话弹窗 -->
+    <div id="export-modal" class="modal hidden">
+      <div class="modal-content export-modal-content">
+        <div class="modal-header">
+          <h3>📤 导出会话</h3>
+          <button id="close-export-modal" class="btn-icon" aria-label="关闭导出">×</button>
+        </div>
+        <div class="modal-body export-modal-body">
+          <div class="export-format-group">
+            <label>导出格式</label>
+            <div class="export-format-options">
+              <label class="export-format-option">
+                <input type="radio" name="export-format" value="markdown" checked>
+                <span>Markdown (.md)</span>
+              </label>
+              <label class="export-format-option">
+                <input type="radio" name="export-format" value="html">
+                <span>HTML (.html)</span>
+              </label>
+              <label class="export-format-option">
+                <input type="radio" name="export-format" value="json">
+                <span>JSON (.json)</span>
+              </label>
+              <label class="export-format-option">
+                <input type="radio" name="export-format" value="txt">
+                <span>纯文本 (.txt)</span>
+              </label>
+            </div>
+          </div>
+          <div class="export-options-group">
+            <label class="export-checkbox">
+              <input type="checkbox" id="export-include-timestamps" checked>
+              <span>包含时间戳</span>
+            </label>
+            <label class="export-checkbox">
+              <input type="checkbox" id="export-include-tool-calls">
+              <span>包含工具调用</span>
+            </label>
+            <label class="export-checkbox">
+              <input type="checkbox" id="export-include-system">
+              <span>包含系统消息</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-export-btn" class="btn-secondary">取消</button>
+          <button id="confirm-export-btn" class="btn-primary">导出</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新建/编辑模板弹窗 -->
+    <div id="template-editor-modal" class="modal hidden">
+      <div class="modal-content template-editor-modal-content">
+        <div class="modal-header">
+          <h3 id="template-editor-title">新建模板</h3>
+          <button id="close-template-editor-modal" class="btn-icon" aria-label="关闭">×</button>
+        </div>
+        <div class="modal-body template-editor-body">
+          <div class="form-group">
+            <label for="template-name-input">模板名称 *</label>
+            <input type="text" id="template-name-input" placeholder="例如：代码审查" />
+          </div>
+          <div class="form-group">
+            <label for="template-description-input">描述</label>
+            <input type="text" id="template-description-input" placeholder="简要描述模板用途" />
+          </div>
+          <div class="form-group">
+            <label for="template-category-select">分类</label>
+            <select id="template-category-select">
+              <option value="coding">💻 编程开发</option>
+              <option value="writing">✍️ 写作创作</option>
+              <option value="analysis">📊 分析研究</option>
+              <option value="translation">🌐 翻译润色</option>
+              <option value="assistant">🤖 日常助手</option>
+              <option value="custom">⭐ 自定义</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="template-content-input">模板内容 *</label>
+            <textarea id="template-content-input" rows="8" placeholder="输入 Prompt 模板，使用 {{变量名}} 定义变量"></textarea>
+            <div class="template-content-hint">提示：使用 {{变量名}} 语法定义可替换变量</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-template-editor-btn" class="btn-secondary">取消</button>
+          <button id="save-template-btn" class="btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MCP 市场弹窗 -->
+    <div id="mcp-market-modal" class="modal hidden">
+      <div class="modal-content market-modal-content">
+        <div class="modal-header">
+          <h3>🛒 MCP 市场</h3>
+          <button id="close-mcp-market-modal" class="btn-icon" aria-label="关闭 MCP 市场">×</button>
+        </div>
+        <div class="modal-tabs">
+          <button class="modal-tab active" data-tab="mcp-market">市场</button>
+          <button class="modal-tab" data-tab="mcp-installed">已安装</button>
+        </div>
+        <div class="modal-body market-modal-body">
+          <div class="market-tab-content active" id="mcp-market-tab">
+            <div class="market-actions">
+              <button id="refresh-mcp-market-btn" class="btn-secondary">刷新</button>
+            </div>
+            <div id="mcp-market-container" class="market-container">
+              <div class="market-empty">点击刷新加载 MCP 市场</div>
+            </div>
+          </div>
+          <div class="market-tab-content" id="mcp-installed-tab">
+            <div class="market-actions">
+              <button id="refresh-installed-mcp-btn" class="btn-secondary">刷新</button>
+            </div>
+            <div id="installed-mcp-container" class="market-container">
+              <div class="market-empty">点击刷新加载已安装的 MCP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent 市场弹窗 -->
+    <div id="agent-market-modal" class="modal hidden">
+      <div class="modal-content market-modal-content">
+        <div class="modal-header">
+          <h3>🤖 Agent 市场</h3>
+          <button id="close-agent-market-modal" class="btn-icon" aria-label="关闭 Agent 市场">×</button>
+        </div>
+        <div class="modal-tabs">
+          <button class="modal-tab active" data-tab="agent-market">市场</button>
+          <button class="modal-tab" data-tab="agent-installed">已安装</button>
+        </div>
+        <div class="modal-body market-modal-body">
+          <div class="market-tab-content active" id="agent-market-tab">
+            <div class="market-actions">
+              <button id="refresh-agent-market-btn" class="btn-secondary">刷新</button>
+            </div>
+            <div id="agent-market-container" class="market-container">
+              <div class="market-empty">点击刷新加载 Agent 市场</div>
+            </div>
+          </div>
+          <div class="market-tab-content" id="agent-installed-tab">
+            <div class="market-actions">
+              <button id="refresh-installed-agent-btn" class="btn-secondary">刷新</button>
+            </div>
+            <div id="installed-agents-container" class="market-container">
+              <div class="market-empty">点击刷新加载已安装的 Agent</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Modern Gradient -->
+    <linearGradient id="mainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow Effect -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- Shadow -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="120" fill="url(#mainGrad)" filter="url(#shadow)"/>
+  
+  <!-- Decorative Circles -->
+  <circle cx="120" cy="100" r="20" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="400" cy="120" r="15" fill="rgba(255,255,255,0.25)"/>
+  <circle cx="90" cy="400" r="12" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="420" cy="420" r="18" fill="rgba(255,255,255,0.3)"/>
+  
+  <!-- Flow Waves -->
+  <g transform="translate(56, 140)">
+    <!-- Wave 1 -->
+    <path d="M0,80 
+             C40,50 80,110 120,80 
+             C160,50 200,110 240,80 
+             C280,50 320,110 360,80 
+             C380,65 390,75 400,95
+             L400,130
+             C360,100 320,140 280,110
+             C240,80 200,140 160,110
+             C120,80 80,140 40,110
+             L0,110 Z" 
+          fill="rgba(255,255,255,0.25)"/>
+    
+    <!-- Wave 2 -->
+    <path d="M0,110 
+             C40,80 80,140 120,110 
+             C160,80 200,140 240,110 
+             C280,80 320,140 360,110 
+             C380,95 390,105 400,125
+             L400,160
+             C360,130 320,170 280,140
+             C240,110 200,170 160,140
+             C120,110 80,170 40,140
+             L0,140 Z" 
+          fill="rgba(255,255,255,0.45)"/>
+    
+    <!-- Wave 3 -->
+    <path d="M0,140 
+             C40,110 80,170 120,140 
+             C160,110 200,170 240,140 
+             C280,110 320,170 360,140 
+             C380,125 390,135 400,155
+             L400,190
+             C360,160 320,200 280,170
+             C240,140 200,200 160,170
+             C120,140 80,200 40,170
+             L0,170 Z" 
+          fill="rgba(255,255,255,0.65)"/>
+  </g>
+  
+  <!-- Central F -->
+  <text x="256" y="380" 
+        font-family="'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif" 
+        font-size="180" 
+        font-weight="700" 
+        fill="white" 
+        text-anchor="middle"
+        style="text-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+    F
+  </text>
+  
+  <!-- Small decorative elements -->
+  <path d="M380,60 Q390,50 400,60" stroke="rgba(255,255,255,0.4)" stroke-width="3" fill="none"/>
+  <path d="M100,380 Q110,370 120,380" stroke="rgba(255,255,255,0.4)" stroke-width="3" fill="none"/>
+</svg>

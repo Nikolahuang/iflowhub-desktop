@@ -1,0 +1,205 @@
+// src/types.ts - Shared type definitions
+
+export interface Agent {
+  id: string;
+  name: string;
+  type: string;
+  status: 'connected' | 'disconnected' | 'connecting' | 'error';
+  workspacePath: string;
+  iflowPath?: string;
+  selectedModel?: string;
+  thinkEnabled?: boolean;
+  port?: number;
+}
+
+export interface Session {
+  id: string;
+  agentId: string;
+  title: string;
+  createdAt: Date;
+  updatedAt: Date;
+  acpSessionId?: string;
+  source?: 'local' | 'iflow-log';
+  messageCountHint?: number;
+}
+
+export interface Message {
+  id: string;
+  role: 'user' | 'assistant' | 'system' | 'thought';
+  content: string;
+  timestamp: Date;
+  agentId?: string;
+  toolCalls?: ToolCall[];
+}
+
+export interface ToolCall {
+  id: string;
+  name: string;
+  status: 'pending' | 'running' | 'completed' | 'error';
+  arguments?: Record<string, unknown>;
+  output?: string;
+}
+
+export type GitStatus =
+  | 'none'
+  | 'modified'
+  | 'added'
+  | 'deleted'
+  | 'renamed'
+  | 'copied'
+  | 'unmerged'
+  | 'untracked'
+  | 'ignored'
+  | 'unknown';
+
+export interface GitFileChange {
+  path: string;
+  stagedStatus: GitStatus;
+  unstagedStatus: GitStatus;
+}
+
+export interface RegistryCommand {
+  name: string;
+  description: string;
+  scope: string;
+}
+
+export interface RegistryMcpServer {
+  name: string;
+  description: string;
+}
+
+export interface ModelOption {
+  label: string;
+  value: string;
+}
+
+export type ThinkSupportStatus = 'unknown' | 'supported' | 'unsupported';
+
+export interface AgentRegistry {
+  commands: RegistryCommand[];
+  mcpServers: RegistryMcpServer[];
+}
+
+export interface SlashMenuItem {
+  id: string;
+  label: string;
+  insertText: string;
+  description: string;
+  hint: string;
+  category: 'command' | 'mcp' | 'builtin';
+  searchable: string;
+}
+
+export interface StoredSession {
+  id: string;
+  agentId: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  acpSessionId?: string;
+  source?: 'local' | 'iflow-log';
+  messageCountHint?: number;
+}
+
+export interface StoredMessage {
+  id: string;
+  role: 'user' | 'assistant' | 'system' | 'thought';
+  content: string;
+  timestamp: string;
+  agentId?: string;
+}
+
+export type StoredSessionMap = Record<string, StoredSession[]>;
+export type StoredMessageMap = Record<string, StoredMessage[]>;
+export type LegacyMessageHistoryMap = Record<string, StoredMessage[]>;
+
+export interface StorageSnapshot {
+  sessionsByAgent: StoredSessionMap;
+  messagesBySession: StoredMessageMap;
+}
+
+export interface IflowHistorySessionRecord {
+  sessionId: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  messageCount: number;
+}
+
+export interface IflowHistoryMessageRecord {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
+
+export type ComposerState = 'ready' | 'busy' | 'disabled';
+export type StreamMessageType = 'content' | 'thought' | 'system' | 'plan';
+export type ThemeMode = 'system' | 'light' | 'dark';
+
+export interface ParsedModelSlashCommand {
+  kind: 'help' | 'switch' | 'current';
+  targetModel?: string;
+  filterKeyword?: string;
+}
+
+// Prompt 模板相关类型
+export interface PromptTemplate {
+  id: string;
+  name: string;
+  description: string;
+  content: string;
+  category: string;
+  variables?: string[];  // 模板中的变量，如 {{topic}}
+  createdAt: Date;
+  updatedAt: Date;
+  isBuiltin?: boolean;  // 内置模板不可删除
+}
+
+export interface PromptTemplateCategory {
+  id: string;
+  name: string;
+  icon: string;
+  order: number;
+}
+
+// 会话导出格式
+export type ExportFormat = 'markdown' | 'json' | 'html' | 'txt';
+
+export interface ExportOptions {
+  format: ExportFormat;
+  includeTimestamps: boolean;
+  includeToolCalls: boolean;
+  includeSystemMessages: boolean;
+}
+
+// MCP 市场相关类型
+export interface McpMarketItem {
+  name: string;
+  description: string;
+  version?: string;
+  author?: string;
+  category?: string;
+  installed: boolean;
+}
+
+export interface AgentMarketItem {
+  name: string;
+  description: string;
+  agentType?: string;
+  category?: string;
+  installed: boolean;
+}
+
+export interface MarketResponse {
+  success: boolean;
+  error?: string;
+  items?: unknown;
+}
+
+export interface InstallResponse {
+  success: boolean;
+  error?: string;
+  message?: string;
+}
