@@ -49,8 +49,15 @@
 
 ### 📸 截图
 
-> [!NOTE]
-> 截图展示区（可在项目 Wiki 中添加）
+<div align="center">
+
+![Screenshot 1](capture/1.png)
+![Screenshot 2](capture/2.png)
+![Screenshot 3](capture/3.png)
+![Screenshot 4](capture/4.png)
+![Screenshot 5](capture/5.png)
+
+</div>
 
 ---
 
@@ -58,21 +65,47 @@
 
 #### 前置要求
 
-- **Node.js** 22+
-- **Rust** 1.70+（通过 rustup 安装）
-- **iFlow CLI** - 访问 [iFlow CLI](https://cli.iflow.cn/) 下载安装
+Node.js 22+
+Rust 1.70+（通过 rustup 安装）
 
-#### 安装依赖
+### iFlow CLI：
+
+# 快速启动Agent代理
+```bash
+bash -c "$(curl -fsSL https://gitee.com/iflow-ai/iflow-cli/raw/main/install.sh)"
+```
+
+
+
+# 已安装Node.js 22+
+```shell
+npm i -g @iflow-ai/iflow-cli@latest
+```
+
+
+Windows
+
+1. Visit https://nodejs.org/en/download to download the latest Node.js installer
+2. Run the installer to install Node.js
+3. Restart terminal: CMD (Windows + R, type cmd) or PowerShell
+4. Run `npm install -g @iflow-ai/iflow-cli@latest` to install iFlow CLI
+5. Run `iflow` to start iFlow CLI
+
+克隆项目并安装依赖：
 
 ```bash
-git clone https://github.com/yourusername/FlowHub.git
-cd FlowHub
+# 克隆项目
+git clone https://github.com/Nikolahuang/iflowhub-desktop.git
+cd iflowhub-desktop
+
+# 安装依赖
 npm install
 ```
 
 #### 启动应用
 
 ```bash
+# 启动开发模式
 npm run tauri:dev
 ```
 
@@ -81,8 +114,18 @@ npm run tauri:dev
 #### 仅启动前端（开发调试）
 
 ```bash
+# 仅启动前端开发服务器
 npm run dev
 ```
+
+#### 构建生产版本
+
+```bash
+# 构建生产版本
+npm run tauri:build
+```
+
+构建完成后，安装包将位于 `src-tauri/target/release/bundle/` 目录。
 
 ---
 
@@ -291,8 +334,8 @@ cargo check
 
 ### 📮 联系方式
 
-- 项目主页：[https://github.com/yourusername/FlowHub](https://github.com/yourusername/FlowHub)
-- 问题反馈：[Issues](https://github.com/yourusername/FlowHub/issues)
+- 项目主页：[https://github.com/Nikolahuang/FlowHub](https://github.com/Nikolahuang/iflowhub-desktop)
+- 问题反馈：[Issues](https://github.com/Nikolahuang/iflowhub-desktop/issues)
 
 ---
 
@@ -580,8 +623,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### 📮 Contact
 
-- Project Homepage: [https://github.com/yourusername/FlowHub](https://github.com/yourusername/FlowHub)
-- Issue Tracker: [Issues](https://github.com/yourusername/FlowHub/issues)
+- Project Homepage: [https://github.com/Nikolahuang/FlowHub](https://github.com/Nikolahuang/iflowhub-desktop)
+- Issue Tracker: [Issues](https://github.com/Nikolahuang/iflowhub-desktop/issues)
 
 ---
 
