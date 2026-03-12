@@ -55,10 +55,34 @@ fn workspace_path_matches(expected_workspace_path: &str, record_cwd: &str) -> bo
 
 fn workspace_to_iflow_project_key(workspace_path: &str) -> String {
     let normalized = normalize_workspace_path(workspace_path);
-    let mut key = normalized.replace('/', "-").replace(':', "-");
+    
+    // 替换所有 Windows 文件系统不允许的字符
+    // 不允许的字符: < > : " / \ | ? *
+    let mut key = normalized
+        .replace('/', "-")
+        .replace('\\', "-")
+        .replace(':', "-")
+        .replace('*', "-")
+        .replace('?', "-")
+        .replace('<', "-")
+        .replace('>', "-")
+        .replace('"', "-")
+        .replace('|', "-");
+    
+    // 确保以 - 开头（这是预期的格式）
     if !key.starts_with('-') {
         key = format!("-{}", key);
     }
+    
+    // 清理连续的 - 字符
+    while key.contains("--") {
+        key = key.replace("--", "-");
+    }
+    
+    // 移除开头和结尾的 - 字符（只保留一个开头的 -）
+    key = key.trim_matches('-').to_string();
+    key = format!("-{}", key);
+    
     key
 }
 
