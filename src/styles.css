@@ -3609,7 +3609,3 @@ body.has-background-image {
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
-
-body.has-background-image .app-container {
-  background-color: transparent;
-}

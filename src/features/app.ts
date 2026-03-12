@@ -2074,24 +2074,53 @@ function onBackgroundImageOpacityChange() {
 
 function applyBackgroundImage() {
   const body = document.body;
+  const appContainer = document.getElementById('app');
 
   if (!state.backgroundImageDataUrl) {
     // 移除背景图片
     body.classList.remove('has-background-image');
     body.style.backgroundImage = '';
+    body.style.backgroundColor = '';
+    if (appContainer) {
+      appContainer.style.backgroundColor = '';
+    }
     return;
   }
 
-  // 应用背景图片
+  // 应用背景图片到 body
   body.classList.add('has-background-image');
   body.style.backgroundImage = `url(${state.backgroundImageDataUrl})`;
+  body.style.backgroundSize = 'cover';
+  body.style.backgroundPosition = 'center';
+  body.style.backgroundRepeat = 'no-repeat';
+  body.style.backgroundAttachment = 'fixed';
 
-  // 创建半透明遮罩
+  // 创建半透明遮罩 - 应用到 app 容器
   const opacity = state.backgroundImageOpacity / 100;
-  const overlayColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim();
-
-  // 使用伪元素或背景色实现半透明效果
-  body.style.backgroundColor = `rgba(${hexToRgb(overlayColor)}, ${1 - opacity})`;
+  
+  // 获取当前主题的背景色
+  const isDark = body.classList.contains('theme-dark');
+  const isLight = body.classList.contains('theme-light');
+  
+  // 根据主题和透明度设置背景色
+  let bgColor;
+  if (isDark) {
+    bgColor = `rgba(13, 17, 23, ${1 - opacity * 0.7})`; // 暗色主题
+  } else if (isLight) {
+    bgColor = `rgba(246, 248, 250, ${1 - opacity * 0.7})`; // 亮色主题
+  } else {
+    // 跟随系统 - 检测系统主题
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    bgColor = systemDark ? `rgba(13, 17, 23, ${1 - opacity * 0.7})` : `rgba(246, 248, 250, ${1 - opacity * 0.7})`;
+  }
+  
+  // 设置 app 容器的背景色为半透明
+  if (appContainer) {
+    appContainer.style.backgroundColor = bgColor;
+  }
+  
+  // 设置 body 背景色
+  body.style.backgroundColor = bgColor;
 }
 
 function updateBackgroundImagePreview() {
