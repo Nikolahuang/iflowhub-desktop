@@ -2114,6 +2114,25 @@ function applyBackgroundImage() {
   // 透明度0%时，界面应该完全不透明（不透明度1），背景图片不可见
   const opacity = state.backgroundImageOpacity / 100;
   
+  // 如果透明度为0%，移除背景图片，恢复正常的主题背景色
+  if (opacity === 0) {
+    body.classList.remove('has-background-image');
+    body.style.backgroundImage = '';
+    body.style.backgroundColor = '';
+    if (appContainer) {
+      appContainer.style.backgroundColor = '';
+    }
+    
+    // 清除所有 CSS 变量
+    document.documentElement.style.removeProperty('--sidebar-bg-opacity');
+    document.documentElement.style.removeProperty('--main-content-bg-opacity');
+    document.documentElement.style.removeProperty('--toolbar-bg-opacity');
+    document.documentElement.style.removeProperty('--sidebar-rgb');
+    document.documentElement.style.removeProperty('--main-content-rgb');
+    document.documentElement.style.removeProperty('--toolbar-rgb');
+    return;
+  }
+  
   // 动态更新 CSS 变量或样式
   const isLight = body.classList.contains('theme-light');
   
