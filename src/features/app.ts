@@ -2157,40 +2157,6 @@ function applyBackgroundImage() {
     document.documentElement.style.setProperty('--toolbar-rgb', toolbarRgb);
     document.documentElement.style.setProperty('--background-image-opacity', backgroundImageOpacity.toString());
   }
-  
-  // 计算不透明度：透明度越高，不透明度越低
-  // 100%透明 -> 10%不透明（保持一点可读性）
-  // 0%透明 -> 100%不透明（完全实色）
-  const sidebarOpacity = 1 - opacity * 0.9;
-  const mainContentOpacity = 1 - opacity * 0.9;
-  const toolbarOpacity = 1 - opacity * 0.85;
-  
-  // 根据主题设置背景色
-  if (isLight) {
-    // 亮色主题
-    const sidebarRgb = '246, 248, 250';
-    const mainContentRgb = '255, 255, 255';
-    const toolbarRgb = '246, 248, 250';
-    
-    document.documentElement.style.setProperty('--sidebar-bg-opacity', sidebarOpacity.toString());
-    document.documentElement.style.setProperty('--main-content-bg-opacity', mainContentOpacity.toString());
-    document.documentElement.style.setProperty('--toolbar-bg-opacity', toolbarOpacity.toString());
-    document.documentElement.style.setProperty('--sidebar-rgb', sidebarRgb);
-    document.documentElement.style.setProperty('--main-content-rgb', mainContentRgb);
-    document.documentElement.style.setProperty('--toolbar-rgb', toolbarRgb);
-  } else {
-    // 暗色主题
-    const sidebarRgb = '22, 27, 34';
-    const mainContentRgb = '13, 17, 23';
-    const toolbarRgb = '22, 27, 34';
-    
-    document.documentElement.style.setProperty('--sidebar-bg-opacity', sidebarOpacity.toString());
-    document.documentElement.style.setProperty('--main-content-bg-opacity', mainContentOpacity.toString());
-    document.documentElement.style.setProperty('--toolbar-bg-opacity', toolbarOpacity.toString());
-    document.documentElement.style.setProperty('--sidebar-rgb', sidebarRgb);
-    document.documentElement.style.setProperty('--main-content-rgb', mainContentRgb);
-    document.documentElement.style.setProperty('--toolbar-rgb', toolbarRgb);
-  }
 }
 
 function updateBackgroundImagePreview() {
