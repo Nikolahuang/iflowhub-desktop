@@ -3609,3 +3609,31 @@ body.has-background-image {
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
+
+body.has-background-image #app {
+  background-color: transparent !important;
+}
+
+body.has-background-image .sidebar {
+  background-color: rgba(var(--sidebar-rgb, 22, 27, 34), var(--sidebar-bg-opacity, 0.85)) !important;
+}
+
+body.theme-light.has-background-image .sidebar {
+  background-color: rgba(var(--sidebar-rgb, 246, 248, 250), var(--sidebar-bg-opacity, 0.85)) !important;
+}
+
+body.has-background-image .main-content {
+  background-color: rgba(var(--main-content-rgb, 13, 17, 23), var(--main-content-bg-opacity, 0.85)) !important;
+}
+
+body.theme-light.has-background-image .main-content {
+  background-color: rgba(var(--main-content-rgb, 255, 255, 255), var(--main-content-bg-opacity, 0.85)) !important;
+}
+
+body.has-background-image .toolbar {
+  background-color: rgba(var(--toolbar-rgb, 22, 27, 34), var(--toolbar-bg-opacity, 0.9)) !important;
+}
+
+body.theme-light.has-background-image .toolbar {
+  background-color: rgba(var(--toolbar-rgb, 246, 248, 250), var(--toolbar-bg-opacity, 0.9)) !important;
+}

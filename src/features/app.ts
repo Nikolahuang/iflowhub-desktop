@@ -2053,6 +2053,15 @@ function onUploadBackgroundImage() {
 function onRemoveBackgroundImage() {
   state.backgroundImageDataUrl = '';
   localStorage.removeItem('iflow-background-image');
+  
+  // 清除 CSS 变量
+  document.documentElement.style.removeProperty('--sidebar-bg-opacity');
+  document.documentElement.style.removeProperty('--main-content-bg-opacity');
+  document.documentElement.style.removeProperty('--toolbar-bg-opacity');
+  document.documentElement.style.removeProperty('--sidebar-rgb');
+  document.documentElement.style.removeProperty('--main-content-rgb');
+  document.documentElement.style.removeProperty('--toolbar-rgb');
+  
   applyBackgroundImage();
   updateBackgroundImagePreview();
   backgroundImageRemoveBtnEl.classList.add('hidden');
@@ -2095,32 +2104,47 @@ function applyBackgroundImage() {
   body.style.backgroundRepeat = 'no-repeat';
   body.style.backgroundAttachment = 'fixed';
 
-  // 创建半透明遮罩 - 应用到 app 容器
+  // 确保 appContainer 是透明的
+  if (appContainer) {
+    appContainer.style.backgroundColor = 'transparent';
+  }
+
+  // 根据透明度设置半透明效果
   const opacity = state.backgroundImageOpacity / 100;
   
-  // 获取当前主题的背景色
-  const isDark = body.classList.contains('theme-dark');
+  // 动态更新 CSS 变量或样式
   const isLight = body.classList.contains('theme-light');
   
-  // 根据主题和透明度设置背景色
-  let bgColor;
-  if (isDark) {
-    bgColor = `rgba(13, 17, 23, ${1 - opacity * 0.7})`; // 暗色主题
-  } else if (isLight) {
-    bgColor = `rgba(246, 248, 250, ${1 - opacity * 0.7})`; // 亮色主题
+  // 更新侧边栏和主内容区的透明度
+  const sidebarOpacity = 0.85 + (1 - opacity) * 0.15;
+  const mainContentOpacity = 0.85 + (1 - opacity) * 0.15;
+  
+  // 根据主题设置背景色
+  if (isLight) {
+    // 亮色主题
+    const sidebarRgb = '246, 248, 250';
+    const mainContentRgb = '255, 255, 255';
+    const toolbarRgb = '246, 248, 250';
+    
+    document.documentElement.style.setProperty('--sidebar-bg-opacity', sidebarOpacity.toString());
+    document.documentElement.style.setProperty('--main-content-bg-opacity', mainContentOpacity.toString());
+    document.documentElement.style.setProperty('--toolbar-bg-opacity', (sidebarOpacity + 0.05).toString());
+    document.documentElement.style.setProperty('--sidebar-rgb', sidebarRgb);
+    document.documentElement.style.setProperty('--main-content-rgb', mainContentRgb);
+    document.documentElement.style.setProperty('--toolbar-rgb', toolbarRgb);
   } else {
-    // 跟随系统 - 检测系统主题
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    bgColor = systemDark ? `rgba(13, 17, 23, ${1 - opacity * 0.7})` : `rgba(246, 248, 250, ${1 - opacity * 0.7})`;
+    // 暗色主题
+    const sidebarRgb = '22, 27, 34';
+    const mainContentRgb = '13, 17, 23';
+    const toolbarRgb = '22, 27, 34';
+    
+    document.documentElement.style.setProperty('--sidebar-bg-opacity', sidebarOpacity.toString());
+    document.documentElement.style.setProperty('--main-content-bg-opacity', mainContentOpacity.toString());
+    document.documentElement.style.setProperty('--toolbar-bg-opacity', (sidebarOpacity + 0.05).toString());
+    document.documentElement.style.setProperty('--sidebar-rgb', sidebarRgb);
+    document.documentElement.style.setProperty('--main-content-rgb', mainContentRgb);
+    document.documentElement.style.setProperty('--toolbar-rgb', toolbarRgb);
   }
-  
-  // 设置 app 容器的背景色为半透明
-  if (appContainer) {
-    appContainer.style.backgroundColor = bgColor;
-  }
-  
-  // 设置 body 背景色
-  body.style.backgroundColor = bgColor;
 }
 
 function updateBackgroundImagePreview() {
