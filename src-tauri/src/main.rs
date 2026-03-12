@@ -23,7 +23,7 @@ mod storage;
 use artifact::{read_html_artifact, resolve_html_artifact_path};
 use commands::{
     browse_agent_market, browse_mcp_market, connect_iflow, disconnect_agent, install_agent, install_mcp,
-    list_installed_agents, list_installed_mcp, send_message, send_long_message, shutdown_all_agents,
+    list_installed_agents, list_installed_mcp, save_export_file, send_message, send_long_message, shutdown_all_agents,
     stop_message, switch_agent_model, toggle_agent_think,
 };
 use dialog::pick_folder;
@@ -65,6 +65,7 @@ fn main() {
             browse_agent_market,
             install_agent,
             list_installed_agents,
+            save_export_file,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

@@ -571,3 +571,30 @@ pub async fn list_installed_agents(state: State<'_, AppState>, agent_id: String)
         Err(_) => Err("List installed agents timeout after 30 seconds".to_string()),
     }
 }
+
+/// 保存导出文件
+#[tauri::command]
+pub async fn save_export_file(
+    app_handle: tauri::AppHandle,
+    content: String,
+    default_filename: String,
+) -> Result<String, String> {
+    use rfd::FileDialog;
+
+    // 打开保存文件对话框
+    let file_path = FileDialog::new()
+        .set_file_name(&default_filename)
+        .save_file();
+
+    match file_path {
+        Some(path) => {
+            // 写入文件
+            std::fs::write(&path, &content)
+                .map_err(|e| format!("写入文件失败: {}", e))?;
+
+            // 返回保存的文件路径
+            Ok(path.to_string_lossy().to_string())
+        }
+        None => Err("用户取消了保存".to_string()),
+    }
+}

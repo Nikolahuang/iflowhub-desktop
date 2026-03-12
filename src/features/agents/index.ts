@@ -1723,9 +1723,42 @@ export function hideLoading() {
 
 export function showSuccess(message: string) {
   console.log('Success:', message);
+
+  // 创建并显示 toast 提示
+  const toast = document.createElement('div');
+  toast.className = 'global-toast success';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  // 添加显示动画
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
+
+  // 自动隐藏
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 
 export function showError(message: string) {
   console.error('Error:', message);
-  alert(message);
+
+  // 创建并显示 toast 提示
+  const toast = document.createElement('div');
+  toast.className = 'global-toast error';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  // 添加显示动画
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
+
+  // 自动隐藏
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
 }

@@ -1,4 +1,5 @@
 // src/features/export.ts — 会话导出功能
+import { invoke } from '@tauri-apps/api/core';
 import { state } from '../store';
 import { formatTime } from '../lib/utils';
 import { escapeHtml } from '../lib/html';
@@ -322,48 +323,84 @@ export function getExportMimeType(format: ExportFormat): string {
 }
 
 // 下载导出文件
-export function downloadExportFile(
+export async function downloadExportFile(
   content: string,
   filename: string,
-  format: ExportFormat
-) {
-  const blob = new Blob([content], { type: getExportMimeType(format) });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  _format: ExportFormat
+): Promise<string | null> {
+  try {
+    // 使用 Tauri 命令保存文件
+    const savedPath = await invoke<string>('save_export_file', {
+      content,
+      defaultFilename: filename,
+    });
+    return savedPath;
+  } catch (error) {
+    // 如果是用户取消，不显示错误
+    if (String(error).includes('取消')) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 // 导出当前会话
-export function exportCurrentSession(
+export async function exportCurrentSession(
   format: ExportFormat = 'markdown',
   options: Partial<ExportOptions> = {}
-): string | null {
+): Promise<string | null> {
+  // 检查是否有当前会话
   if (!state.currentSessionId) {
+    console.error('导出失败：没有当前会话');
     return null;
   }
-  
-  const session = state.sessionsByAgent[state.currentAgentId!]?.find(
-    s => s.id === state.currentSessionId
-  );
-  
+
+  // 检查是否有当前 Agent
+  if (!state.currentAgentId) {
+    console.error('导出失败：没有选择 Agent');
+    return null;
+  }
+
+  // 查找会话
+  const agentSessions = state.sessionsByAgent[state.currentAgentId];
+  if (!agentSessions) {
+    console.error('导出失败：找不到当前 Agent 的会话列表');
+    return null;
+  }
+
+  const session = agentSessions.find(s => s.id === state.currentSessionId);
+
   if (!session) {
+    console.error('导出失败：找不到当前会话');
     return null;
   }
-  
+
+  // 获取消息
   const messages = state.messagesBySession[state.currentSessionId] || [];
+  if (messages.length === 0) {
+    console.warn('警告：会话中没有消息');
+  }
+
+  // 生成导出内容
   const content = exportSession(session, messages, format, options);
-  
+
+  // 生成文件名（移除特殊字符）
   const timestamp = new Date().toISOString().slice(0, 10);
-  const filename = `${session.title.slice(0, 30)}_${timestamp}.${getExportFileExtension(format)}`;
-  
-  downloadExportFile(content, filename, format);
-  
-  return content;
+  const safeTitle = session.title
+    .replace(/[<>:"/\\|?*]/g, '_') // 移除非法文件名字符
+    .slice(0, 30)
+    .trim() || '未命名会话';
+  const filename = `${safeTitle}_${timestamp}.${getExportFileExtension(format)}`;
+
+  // 保存文件
+  const savedPath = await downloadExportFile(content, filename, format);
+
+  if (savedPath) {
+    console.log(`导出成功：${savedPath}`);
+    return savedPath;
+  }
+
+  return null;
 }
 
 // 渲染导出选项面板

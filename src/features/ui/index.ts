@@ -11,6 +11,19 @@ import { formatMessageContent } from '../../lib/markdown';
 import type { ToolCall, GitFileChange, GitStatus } from '../../types';
 import { state } from '../../store';
 import { TIMEOUTS } from '../../config';
+
+/**
+ * 将工具调用状态翻译为中文
+ */
+function translateToolStatus(status: string): string {
+  const statusMap: Record<string, string> = {
+    'pending': '等待中',
+    'running': '运行中',
+    'completed': '已完成',
+    'error': '出错',
+  };
+  return statusMap[status] || status;
+}
 import {
   chatMessagesEl,
   artifactPreviewModalEl,
@@ -715,7 +728,7 @@ export function showToolCalls(toolCalls: ToolCall[], options?: { forceOpen?: boo
       (tc) => `
     <div class="tool-call-item">
       <div class="tool-name">${escapeHtml(tc.name)}</div>
-      <div class="tool-status">状态: ${tc.status}</div>
+      <div class="tool-status">状态: ${translateToolStatus(tc.status)}</div>
       ${
         tc.arguments
           ? `<div class="tool-args">${escapeHtml(JSON.stringify(tc.arguments, null, 2))}</div>`

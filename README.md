@@ -50,9 +50,8 @@
 ### 📸 截图
 
 <div align="center">
-
 ![Screenshot 1](capture/1.png)
-![Screenshot 2](capture/2.png)
+![](capture/2.png)
 ![Screenshot 3](capture/3.png)
 ![Screenshot 4](capture/4.png)
 ![Screenshot 5](capture/5.png)
@@ -329,6 +328,7 @@ cargo check
 - [iFlow CLI](https://cli.iflow.cn/) - 强大的命令行 AI 助手
 - [Rust](https://www.rust-lang.org/) - 系统编程语言
 - [TypeScript](https://www.typescriptlang.org/) - JavaScript 的超集
+- [chenweil](https://github.com/chenweil/FlowHub)  - 原创作者
 
 ---
 

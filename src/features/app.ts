@@ -157,6 +157,7 @@ import {
   refreshCurrentAgentGitChanges,
   showGitChangesForAgent,
   showError,
+  showSuccess,
 } from './agents';
 import {
   renderMessages,
@@ -1631,21 +1632,26 @@ export function setupEventListeners() {
     }
   });
 
-  confirmExportBtnEl.addEventListener('click', () => {
+  confirmExportBtnEl.addEventListener('click', async () => {
     const formatRadio = exportModalEl.querySelector('input[name="export-format"]:checked') as HTMLInputElement;
     const format = (formatRadio?.value || 'markdown') as ExportFormat;
-    
+
     const options = {
       includeTimestamps: exportIncludeTimestampsEl.checked,
       includeToolCalls: exportIncludeToolCallsEl.checked,
       includeSystemMessages: exportIncludeSystemEl.checked,
     };
 
-    const result = exportCurrentSession(format, options);
-    if (result) {
-      exportModalEl.classList.add('hidden');
-    } else {
-      showError('导出失败：未找到当前会话');
+    try {
+      const result = await exportCurrentSession(format, options);
+      if (result) {
+        exportModalEl.classList.add('hidden');
+        showSuccess(`会话已保存到：${result}`);
+      }
+      // 如果 result 为 null，表示用户取消了保存，不显示错误
+    } catch (error) {
+      console.error('导出错误:', error);
+      showError(`导出失败：${error}`);
     }
   });
 
