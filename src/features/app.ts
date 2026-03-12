@@ -2110,14 +2110,19 @@ function applyBackgroundImage() {
   }
 
   // 根据透明度设置半透明效果
+  // 透明度100%时，界面应该完全透明（不透明度0），背景图片完全可见
+  // 透明度0%时，界面应该完全不透明（不透明度1），背景图片不可见
   const opacity = state.backgroundImageOpacity / 100;
   
   // 动态更新 CSS 变量或样式
   const isLight = body.classList.contains('theme-light');
   
-  // 更新侧边栏和主内容区的透明度
-  const sidebarOpacity = 0.85 + (1 - opacity) * 0.15;
-  const mainContentOpacity = 0.85 + (1 - opacity) * 0.15;
+  // 计算不透明度：透明度越高，不透明度越低
+  // 100%透明 -> 10%不透明（保持一点可读性）
+  // 0%透明 -> 100%不透明（完全实色）
+  const sidebarOpacity = 1 - opacity * 0.9;
+  const mainContentOpacity = 1 - opacity * 0.9;
+  const toolbarOpacity = 1 - opacity * 0.85;
   
   // 根据主题设置背景色
   if (isLight) {
@@ -2128,7 +2133,7 @@ function applyBackgroundImage() {
     
     document.documentElement.style.setProperty('--sidebar-bg-opacity', sidebarOpacity.toString());
     document.documentElement.style.setProperty('--main-content-bg-opacity', mainContentOpacity.toString());
-    document.documentElement.style.setProperty('--toolbar-bg-opacity', (sidebarOpacity + 0.05).toString());
+    document.documentElement.style.setProperty('--toolbar-bg-opacity', toolbarOpacity.toString());
     document.documentElement.style.setProperty('--sidebar-rgb', sidebarRgb);
     document.documentElement.style.setProperty('--main-content-rgb', mainContentRgb);
     document.documentElement.style.setProperty('--toolbar-rgb', toolbarRgb);
@@ -2140,7 +2145,7 @@ function applyBackgroundImage() {
     
     document.documentElement.style.setProperty('--sidebar-bg-opacity', sidebarOpacity.toString());
     document.documentElement.style.setProperty('--main-content-bg-opacity', mainContentOpacity.toString());
-    document.documentElement.style.setProperty('--toolbar-bg-opacity', (sidebarOpacity + 0.05).toString());
+    document.documentElement.style.setProperty('--toolbar-bg-opacity', toolbarOpacity.toString());
     document.documentElement.style.setProperty('--sidebar-rgb', sidebarRgb);
     document.documentElement.style.setProperty('--main-content-rgb', mainContentRgb);
     document.documentElement.style.setProperty('--toolbar-rgb', toolbarRgb);
