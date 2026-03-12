@@ -2061,6 +2061,7 @@ function onRemoveBackgroundImage() {
   document.documentElement.style.removeProperty('--sidebar-rgb');
   document.documentElement.style.removeProperty('--main-content-rgb');
   document.documentElement.style.removeProperty('--toolbar-rgb');
+  document.documentElement.style.removeProperty('--background-image-opacity');
   
   applyBackgroundImage();
   updateBackgroundImagePreview();
@@ -2093,6 +2094,15 @@ function applyBackgroundImage() {
     if (appContainer) {
       appContainer.style.backgroundColor = '';
     }
+    
+    // 清除所有 CSS 变量
+    document.documentElement.style.removeProperty('--sidebar-bg-opacity');
+    document.documentElement.style.removeProperty('--main-content-bg-opacity');
+    document.documentElement.style.removeProperty('--toolbar-bg-opacity');
+    document.documentElement.style.removeProperty('--sidebar-rgb');
+    document.documentElement.style.removeProperty('--main-content-rgb');
+    document.documentElement.style.removeProperty('--toolbar-rgb');
+    document.documentElement.style.removeProperty('--background-image-opacity');
     return;
   }
 
@@ -2109,32 +2119,44 @@ function applyBackgroundImage() {
     appContainer.style.backgroundColor = 'transparent';
   }
 
-  // 根据透明度设置半透明效果
-  // 透明度100%时，界面应该完全透明（不透明度0），背景图片完全可见
-  // 透明度0%时，界面应该完全不透明（不透明度1），背景图片不可见
-  const opacity = state.backgroundImageOpacity / 100;
+  // 透明度逻辑：
+  // 0%透明度：0%背景图片可见，100%原始主题蒙版
+  // 100%透明度：100%背景图片可见，0%原始主题蒙版
+  // 中间值：背景图片和原始主题蒙版的叠加
+  const backgroundImageOpacity = state.backgroundImageOpacity / 100;
+  const themeMaskOpacity = 1 - backgroundImageOpacity;
   
-  // 如果透明度为0%，移除背景图片，恢复正常的主题背景色
-  if (opacity === 0) {
-    body.classList.remove('has-background-image');
-    body.style.backgroundImage = '';
-    body.style.backgroundColor = '';
-    if (appContainer) {
-      appContainer.style.backgroundColor = '';
-    }
-    
-    // 清除所有 CSS 变量
-    document.documentElement.style.removeProperty('--sidebar-bg-opacity');
-    document.documentElement.style.removeProperty('--main-content-bg-opacity');
-    document.documentElement.style.removeProperty('--toolbar-bg-opacity');
-    document.documentElement.style.removeProperty('--sidebar-rgb');
-    document.documentElement.style.removeProperty('--main-content-rgb');
-    document.documentElement.style.removeProperty('--toolbar-rgb');
-    return;
-  }
-  
-  // 动态更新 CSS 变量或样式
+  // 动态更新 CSS 变量
   const isLight = body.classList.contains('theme-light');
+  
+  // 根据主题设置背景色
+  if (isLight) {
+    // 亮色主题
+    const sidebarRgb = '246, 248, 250';
+    const mainContentRgb = '255, 255, 255';
+    const toolbarRgb = '246, 248, 250';
+    
+    document.documentElement.style.setProperty('--sidebar-bg-opacity', themeMaskOpacity.toString());
+    document.documentElement.style.setProperty('--main-content-bg-opacity', themeMaskOpacity.toString());
+    document.documentElement.style.setProperty('--toolbar-bg-opacity', themeMaskOpacity.toString());
+    document.documentElement.style.setProperty('--sidebar-rgb', sidebarRgb);
+    document.documentElement.style.setProperty('--main-content-rgb', mainContentRgb);
+    document.documentElement.style.setProperty('--toolbar-rgb', toolbarRgb);
+    document.documentElement.style.setProperty('--background-image-opacity', backgroundImageOpacity.toString());
+  } else {
+    // 暗色主题
+    const sidebarRgb = '22, 27, 34';
+    const mainContentRgb = '13, 17, 23';
+    const toolbarRgb = '22, 27, 34';
+    
+    document.documentElement.style.setProperty('--sidebar-bg-opacity', themeMaskOpacity.toString());
+    document.documentElement.style.setProperty('--main-content-bg-opacity', themeMaskOpacity.toString());
+    document.documentElement.style.setProperty('--toolbar-bg-opacity', themeMaskOpacity.toString());
+    document.documentElement.style.setProperty('--sidebar-rgb', sidebarRgb);
+    document.documentElement.style.setProperty('--main-content-rgb', mainContentRgb);
+    document.documentElement.style.setProperty('--toolbar-rgb', toolbarRgb);
+    document.documentElement.style.setProperty('--background-image-opacity', backgroundImageOpacity.toString());
+  }
   
   // 计算不透明度：透明度越高，不透明度越低
   // 100%透明 -> 10%不透明（保持一点可读性）

@@ -3608,6 +3608,25 @@ body.has-background-image {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  position: relative;
+}
+
+/* 背景图片层 */
+body.has-background-image::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: inherit;
+  background-size: inherit;
+  background-position: inherit;
+  background-repeat: inherit;
+  background-attachment: inherit;
+  pointer-events: none;
+  z-index: -1;
+  opacity: var(--background-image-opacity, 0.5);
 }
 
 body.has-background-image #app {
@@ -3615,25 +3634,25 @@ body.has-background-image #app {
 }
 
 body.has-background-image .sidebar {
-  background-color: rgba(var(--sidebar-rgb, 22, 27, 34), var(--sidebar-bg-opacity, 0.85)) !important;
+  background-color: rgba(var(--sidebar-rgb, 22, 27, 34), var(--sidebar-bg-opacity, 0.5)) !important;
 }
 
 body.theme-light.has-background-image .sidebar {
-  background-color: rgba(var(--sidebar-rgb, 246, 248, 250), var(--sidebar-bg-opacity, 0.85)) !important;
+  background-color: rgba(var(--sidebar-rgb, 246, 248, 250), var(--sidebar-bg-opacity, 0.5)) !important;
 }
 
 body.has-background-image .main-content {
-  background-color: rgba(var(--main-content-rgb, 13, 17, 23), var(--main-content-bg-opacity, 0.85)) !important;
+  background-color: rgba(var(--main-content-rgb, 13, 17, 23), var(--main-content-bg-opacity, 0.5)) !important;
 }
 
 body.theme-light.has-background-image .main-content {
-  background-color: rgba(var(--main-content-rgb, 255, 255, 255), var(--main-content-bg-opacity, 0.85)) !important;
+  background-color: rgba(var(--main-content-rgb, 255, 255, 255), var(--main-content-bg-opacity, 0.5)) !important;
 }
 
 body.has-background-image .toolbar {
-  background-color: rgba(var(--toolbar-rgb, 22, 27, 34), var(--toolbar-bg-opacity, 0.9)) !important;
+  background-color: rgba(var(--toolbar-rgb, 22, 27, 34), var(--toolbar-bg-opacity, 0.5)) !important;
 }
 
 body.theme-light.has-background-image .toolbar {
-  background-color: rgba(var(--toolbar-rgb, 246, 248, 250), var(--toolbar-bg-opacity, 0.9)) !important;
+  background-color: rgba(var(--toolbar-rgb, 246, 248, 250), var(--toolbar-bg-opacity, 0.5)) !important;
 }
