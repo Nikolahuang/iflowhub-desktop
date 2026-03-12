@@ -1184,6 +1184,24 @@ export function setupEventListeners() {
     applyTheme(state.currentTheme);
     localStorage.setItem(THEME_STORAGE_KEY, state.currentTheme);
   });
+
+  // 背景图片事件监听
+  backgroundImageUploadBtnEl.addEventListener('click', () => {
+    backgroundImageUploadInputEl.click();
+  });
+
+  backgroundImageUploadInputEl.addEventListener('change', () => {
+    void onUploadBackgroundImage();
+  });
+
+  backgroundImageRemoveBtnEl.addEventListener('click', () => {
+    onRemoveBackgroundImage();
+  });
+
+  backgroundImageOpacityEl.addEventListener('input', () => {
+    onBackgroundImageOpacityChange();
+  });
+
   notificationSoundSelectEl.addEventListener('change', () => {
     applyNotificationSoundSelection(notificationSoundSelectEl.value);
     void playTaskFinishSound();
@@ -1991,5 +2009,121 @@ export async function stopCurrentMessage() {
     await stopMessage(requestAgentId);
   } catch (error) {
     showError(`停止请求失败: ${String(error)}`);
+  }
+}
+
+// 背景图片相关函数
+function onUploadBackgroundImage() {
+  const file = backgroundImageUploadInputEl.files?.[0];
+  if (!file) return;
+
+  // 验证文件类型
+  if (!file.type.startsWith('image/')) {
+    showError('请选择图片文件');
+    return;
+  }
+
+  // 验证文件大小（最大 10MB）
+  const maxSize = 10 * 1024 * 1024;
+  if (file.size > maxSize) {
+    showError('图片文件过大，请选择小于 10MB 的图片');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const dataUrl = event.target?.result as string;
+    state.backgroundImageDataUrl = dataUrl;
+    localStorage.setItem('iflow-background-image', dataUrl);
+    applyBackgroundImage();
+    updateBackgroundImagePreview();
+    backgroundImageRemoveBtnEl.classList.remove('hidden');
+  };
+  reader.onerror = () => {
+    showError('读取图片失败');
+  };
+  reader.readAsDataURL(file);
+}
+
+function onRemoveBackgroundImage() {
+  state.backgroundImageDataUrl = '';
+  localStorage.removeItem('iflow-background-image');
+  applyBackgroundImage();
+  updateBackgroundImagePreview();
+  backgroundImageRemoveBtnEl.classList.add('hidden');
+  backgroundImageUploadInputEl.value = '';
+}
+
+function onBackgroundImageOpacityChange() {
+  const opacity = backgroundImageOpacityEl.value;
+  state.backgroundImageOpacity = parseInt(opacity, 10);
+  localStorage.setItem('iflow-background-opacity', opacity);
+  applyBackgroundImage();
+
+  // 更新显示的值
+  const valueDisplay = backgroundImageOpacityEl.nextElementSibling as HTMLElement;
+  if (valueDisplay) {
+    valueDisplay.textContent = `${opacity}%`;
+  }
+}
+
+function applyBackgroundImage() {
+  const body = document.body;
+
+  if (!state.backgroundImageDataUrl) {
+    // 移除背景图片
+    body.classList.remove('has-background-image');
+    body.style.backgroundImage = '';
+    return;
+  }
+
+  // 应用背景图片
+  body.classList.add('has-background-image');
+  body.style.backgroundImage = `url(${state.backgroundImageDataUrl})`;
+
+  // 创建半透明遮罩
+  const opacity = state.backgroundImageOpacity / 100;
+  const overlayColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim();
+
+  // 使用伪元素或背景色实现半透明效果
+  body.style.backgroundColor = `rgba(${hexToRgb(overlayColor)}, ${1 - opacity})`;
+}
+
+function updateBackgroundImagePreview() {
+  if (!state.backgroundImageDataUrl) {
+    backgroundImagePreviewEl.style.backgroundImage = '';
+    backgroundImagePreviewEl.innerHTML = '<span class="background-image-placeholder">暂无背景图片</span>';
+    return;
+  }
+
+  backgroundImagePreviewEl.style.backgroundImage = `url(${state.backgroundImageDataUrl})`;
+  backgroundImagePreviewEl.innerHTML = '';
+}
+
+function hexToRgb(hex: string): string {
+  // 处理十六进制颜色转换为 RGB
+  hex = hex.replace('#', '');
+  if (hex.length === 3) {
+    hex = hex.split('').map((c) => c + c).join('');
+  }
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  return `${r}, ${g}, ${b}`;
+}
+
+export function initializeBackgroundImage() {
+  // 初始化背景图片透明度值
+  backgroundImageOpacityEl.value = state.backgroundImageOpacity.toString();
+  const valueDisplay = backgroundImageOpacityEl.nextElementSibling as HTMLElement;
+  if (valueDisplay) {
+    valueDisplay.textContent = `${state.backgroundImageOpacity}%`;
+  }
+
+  // 应用已保存的背景图片
+  if (state.backgroundImageDataUrl) {
+    applyBackgroundImage();
+    updateBackgroundImagePreview();
+    backgroundImageRemoveBtnEl.classList.remove('hidden');
   }
 }

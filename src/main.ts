@@ -7,6 +7,7 @@ import {
   setupTauriEventListeners,
   setSendButtonMode,
   refreshComposerState,
+  initializeBackgroundImage,
 } from './features/app';
 import { loadAgents, updateCurrentAgentModelUI, updateCurrentAgentThinkUI } from './features/agents';
 import { warmUpArtifactPreviewFrame } from './features/ui';
@@ -68,6 +69,9 @@ async function init() {
     // 设置事件监听
     setupEventListeners();
     setupTauriEventListeners();
+    
+    // 初始化背景图片
+    initializeBackgroundImage();
     
     // 预热 Artifact 预览
     warmUpArtifactPreviewFrame();

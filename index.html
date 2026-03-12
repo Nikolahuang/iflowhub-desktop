@@ -389,6 +389,53 @@
             <div class="settings-group-title">外观</div>
             <button id="theme-toggle-btn" class="btn-secondary settings-theme-btn" title="跟随系统" aria-label="切换主题">主题：◑</button>
           </div>
+
+          <div class="settings-group">
+            <div class="settings-group-title">背景图片</div>
+            <div class="background-image-controls">
+              <div class="background-image-preview" id="background-image-preview">
+                <span class="background-image-placeholder">暂无背景图片</span>
+              </div>
+              <div class="background-image-actions">
+                <input
+                  id="background-image-upload-input"
+                  type="file"
+                  accept="image/*"
+                  class="hidden-file-input"
+                />
+                <button
+                  id="background-image-upload-btn"
+                  class="btn-secondary btn-compact"
+                  type="button"
+                >
+                  上传背景图
+                </button>
+                <button
+                  id="background-image-remove-btn"
+                  class="btn-secondary btn-compact hidden"
+                  type="button"
+                >
+                  移除背景
+                </button>
+              </div>
+              <div class="background-image-opacity-control">
+                <span class="background-image-opacity-label">透明度</span>
+                <input
+                  id="background-image-opacity"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="30"
+                  class="background-image-opacity-slider"
+                  aria-label="背景图片透明度"
+                />
+                <span class="background-image-opacity-value">30%</span>
+              </div>
+              <div class="background-image-hint">
+                支持 JPG、PNG、GIF 等常见图片格式，建议使用浅色图片
+              </div>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button id="close-settings-footer-btn" class="btn-primary">完成</button>

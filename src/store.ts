@@ -81,6 +81,10 @@ export const state = {
   notificationCustomSoundDataUrl: localStorage.getItem('iflow-notification-custom-sound'),
   notificationCustomSoundName: localStorage.getItem('iflow-notification-custom-sound-name'),
 
+  // 背景图片
+  backgroundImageDataUrl: localStorage.getItem('iflow-background-image') || '',
+  backgroundImageOpacity: parseInt(localStorage.getItem('iflow-background-opacity') || '30', 10),
+
   // Prompt 模板库
   promptTemplates: [] as PromptTemplate[],
   promptTemplateCategories: [] as PromptTemplateCategory[],

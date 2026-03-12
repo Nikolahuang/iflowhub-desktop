@@ -80,6 +80,23 @@ export const notificationSoundUploadInputEl = document.getElementById(
 ) as HTMLInputElement;
 export const appVersionEl = document.getElementById('app-version') as HTMLDivElement;
 
+// 背景图片相关元素
+export const backgroundImageUploadInputEl = document.getElementById(
+  'background-image-upload-input'
+) as HTMLInputElement;
+export const backgroundImageUploadBtnEl = document.getElementById(
+  'background-image-upload-btn'
+) as HTMLButtonElement;
+export const backgroundImageRemoveBtnEl = document.getElementById(
+  'background-image-remove-btn'
+) as HTMLButtonElement;
+export const backgroundImagePreviewEl = document.getElementById(
+  'background-image-preview'
+) as HTMLDivElement;
+export const backgroundImageOpacityEl = document.getElementById(
+  'background-image-opacity'
+) as HTMLInputElement;
+
 // 模板库相关元素
 export const openTemplatesBtnEl = document.getElementById('open-templates-btn') as HTMLButtonElement;
 export const templatesModalEl = document.getElementById('templates-modal') as HTMLDivElement;
