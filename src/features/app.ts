@@ -7,6 +7,7 @@ import {
   onAcpSession,
   onTaskFinish,
   onAgentError,
+  onAgentWarning,
 } from '../services/events';
 import {
   getVersion,
@@ -845,8 +846,52 @@ export function setupTauriEventListeners() {
     if (payload.agentId && payload.agentId !== state.currentAgentId) {
       return;
     }
-    showError(`错误: ${payload.error || '未知错误'}`);
+
+    const error = payload.error || '未知错误';
+    console.error('[Agent Error]', payload);
+
+    // 检查是否是 WebSocket 连接被拒绝的错误
+    if (error.includes('Connection refused') || error.includes('os error 10061') || error.includes('连接被拒绝')) {
+      showError(
+        `连接错误: iFlow CLI 进程可能已停止运行
+
+原因: ${error}
+
+建议解决方案:
+1. 检查 iFlow CLI 是否仍在运行
+2. 重新连接 Agent
+3. 如果问题持续，请重启应用`
+      );
+    } else if (error.includes('Failed after')) {
+      showError(
+        `连接失败: 无法连接到 iFlow CLI
+
+错误: ${error}
+
+建议解决方案:
+1. 检查 iFlow CLI 是否正常启动
+2. 尝试重新连接 Agent
+3. 如问题持续，请重启应用和 iFlow CLI`
+      );
+    } else {
+      showError(`错误: ${error}`);
+    }
+
     refreshComposerState();
+  });
+
+  onAgentWarning((payload) => {
+    if (payload.agentId && payload.agentId !== state.currentAgentId) {
+      return;
+    }
+
+    console.warn('[Agent Warning]', payload);
+
+    // 显示警告信息（不作为错误，只是提醒用户）
+    if (payload.warning) {
+      console.log('[Reconnecting]', payload.warning);
+      // 可以在这里显示一个非阻塞的通知，但不中断用户操作
+    }
   });
 }
 

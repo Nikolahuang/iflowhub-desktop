@@ -1279,17 +1279,46 @@ pub async fn message_listener_task(
             }
             Err(e) => {
                 retry_count += 1;
-                println!("[listener] Connection failed: {}", e);
+                println!("[listener] Connection failed (attempt {}/{}): {}", retry_count, max_retries, e);
+
+                // 提供更详细的错误信息
+                let error_detail = if retry_count >= max_retries {
+                    format!(
+                        "Failed after {} attempts: {}. This usually means the iFlow CLI process has stopped or the port is not accessible.",
+                        max_retries, e
+                    )
+                } else {
+                    format!(
+                        "Connection attempt {} failed: {}. Retrying in 2 seconds...",
+                        retry_count, e
+                    )
+                };
+
                 if retry_count >= max_retries {
                     let _ = app_handle.emit(
                         "agent-error",
                         json!({
                             "agentId": &agent_id,
-                            "error": format!("Failed after {} attempts: {}", max_retries, e),
+                            "error": error_detail,
+                            "retryCount": retry_count,
+                            "maxRetries": max_retries,
+                            "wsUrl": ws_url,
                         }),
                     );
                     break;
                 }
+
+                // 发送警告事件（不是错误，让用户知道正在重试）
+                if retry_count == 1 {
+                    let _ = app_handle.emit(
+                        "agent-warning",
+                        json!({
+                            "agentId": &agent_id,
+                            "warning": format!("WebSocket connection lost. Attempting to reconnect to iFlow CLI at {}...", ws_url),
+                        }),
+                    );
+                }
+
                 tokio::time::sleep(Duration::from_secs(2)).await;
             }
         }

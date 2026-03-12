@@ -39,6 +39,14 @@ export interface TaskFinishPayload {
 export interface AgentErrorPayload {
   agentId?: string;
   error?: string;
+  retryCount?: number;
+  maxRetries?: number;
+  wsUrl?: string;
+}
+
+export interface AgentWarningPayload {
+  agentId?: string;
+  warning?: string;
 }
 
 // Typed wrapper functions
@@ -81,4 +89,10 @@ export function onAgentError(
   callback: (payload: AgentErrorPayload) => void
 ): Promise<UnlistenFn> {
   return listen<AgentErrorPayload>('agent-error', (event) => callback(event.payload));
+}
+
+export function onAgentWarning(
+  callback: (payload: AgentWarningPayload) => void
+): Promise<UnlistenFn> {
+  return listen<AgentWarningPayload>('agent-warning', (event) => callback(event.payload));
 }
