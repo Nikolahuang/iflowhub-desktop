@@ -1,11 +1,11 @@
 // src/features/market.ts - MCP 和 Agent 市场功能
 import {
-  browseMcpMarket,
   installMcp,
   listInstalledMcp,
-  browseAgentMarket,
   installAgent,
   listInstalledAgents,
+  getLocalMcpMarket,
+  getLocalAgentMarket,
 } from '../services/tauri';
 import type {
   McpMarketItem,
@@ -160,17 +160,12 @@ function parseAgentMarketResponse(response: MarketResponse): AgentMarketItem[] {
   return result;
 }
 
-// 浏览 MCP 市场
+// 浏览 MCP 市场（从本地数据文件读取）
 export async function loadMcpMarket(): Promise<void> {
-  if (!state.currentAgentId) {
-    showError('请先连接一个 Agent');
-    return;
-  }
-
   showLoading('正在加载 MCP 市场...');
 
   try {
-    const response = await browseMcpMarket(state.currentAgentId);
+    const response = await getLocalMcpMarket();
 
     if (!response.success) {
       showError(response.error || '加载 MCP 市场失败');
@@ -255,78 +250,37 @@ export async function loadInstalledMcp(): Promise<void> {
   }
 }
 
-// 浏览 Agent 市场
-
+// 浏览 Agent 市场（从本地数据文件读取）
 export async function loadAgentMarket(): Promise<void> {
-
-  if (!state.currentAgentId) {
-
-    showError('请先连接一个 Agent');
-
-    return;
-
-  }
-
-
-
   showLoading('正在加载 Agent 市场...');
 
-
-
   try {
-
-    const response = await browseAgentMarket(state.currentAgentId);
-
-
+    const response = await getLocalAgentMarket();
 
     if (!response.success) {
-
       showError(response.error || '加载 Agent 市场失败');
-
       return;
-
     }
-
-
 
     const items = parseAgentMarketResponse(response);
-
     
-
     // 如果返回空列表，显示使用说明
-
     if (items.length === 0) {
-
       showMarketInstructions('agent');
-
       state.agentMarketItems = [];
-
       renderAgentMarket();
-
       return;
-
     }
-
     
-
     state.agentMarketItems = items;
-
     renderAgentMarket();
-
     showSuccess(`成功加载 ${items.length} 个 Agent`);
-
   } catch (error) {
-
     console.error('Load agent market error:', error);
-
     showError(`加载 Agent 市场失败: ${String(error)}`);
-
   } finally {
-
     hideLoading();
-
   }
-
 }
 
 // 安装 Agent
@@ -398,14 +352,7 @@ export function renderMcpMarket(): void {
       <div class="market-empty">
         <div class="market-empty-icon">🛒</div>
         <h3>MCP 市场</h3>
-        <p>当前版本需要在 iFlow CLI 中进行交互操作</p>
-        <div class="market-instructions">
-          <strong>使用方法：</strong>
-          <ol>
-            <li>在 iFlow CLI 命令行中执行：<code>/mcp online</code></li>
-            <li>使用上下箭头浏览，数字键安装</li>
-          </ol>
-        </div>
+        <p>暂无可用的 MCP 工具</p>
         <a href="https://platform.iflow.cn/mcp" target="_blank" class="market-link">
           🌐 访问 iFlow MCP 市场
         </a>
@@ -423,9 +370,10 @@ export function renderMcpMarket(): void {
         ${item.installed ? '<span class="market-item-badge installed">已安装</span>' : ''}
       </div>
       <p class="market-item-description">${escapeHtml(item.description)}</p>
-      ${item.version ? `<div class="market-item-meta">版本: ${escapeHtml(item.version)}</div>` : ''}
-      ${item.author ? `<div class="market-item-meta">作者: ${escapeHtml(item.author)}</div>` : ''}
-      ${item.category ? `<div class="market-item-meta">分类: ${escapeHtml(item.category)}</div>` : ''}
+      <div class="market-item-meta-row">
+        ${item.category ? `<span class="market-item-tag">${escapeHtml(item.category)}</span>` : ''}
+        ${item.author ? `<span class="market-item-meta">作者: ${escapeHtml(item.author)}</span>` : ''}
+      </div>
       <button
         class="market-item-install-btn"
         data-mcp-name="${escapeHtml(item.name)}"
@@ -478,14 +426,7 @@ export function renderAgentMarket(): void {
       <div class="market-empty">
         <div class="market-empty-icon">🤖</div>
         <h3>Agent 市场</h3>
-        <p>当前版本需要在 iFlow CLI 中进行交互操作</p>
-        <div class="market-instructions">
-          <strong>使用方法：</strong>
-          <ol>
-            <li>在 iFlow CLI 命令行中执行：<code>/agents online</code></li>
-            <li>使用上下箭头浏览，数字键安装</li>
-          </ol>
-        </div>
+        <p>暂无可用的 Agent</p>
         <a href="https://platform.iflow.cn/agents" target="_blank" class="market-link">
           🌐 访问 iFlow Agent 市场
         </a>
@@ -503,8 +444,10 @@ export function renderAgentMarket(): void {
         ${item.installed ? '<span class="market-item-badge installed">已安装</span>' : ''}
       </div>
       <p class="market-item-description">${escapeHtml(item.description)}</p>
-      ${item.agentType ? `<div class="market-item-meta">类型: ${escapeHtml(item.agentType)}</div>` : ''}
-      ${item.category ? `<div class="market-item-meta">分类: ${escapeHtml(item.category)}</div>` : ''}
+      <div class="market-item-meta-row">
+        ${item.agentType ? `<span class="market-item-tag">${escapeHtml(item.agentType)}</span>` : ''}
+        ${item.category ? `<span class="market-item-tag">${escapeHtml(item.category)}</span>` : ''}
+      </div>
       <button
         class="market-item-install-btn"
         data-agent-name="${escapeHtml(item.name)}"
@@ -573,12 +516,8 @@ export function handleAgentMarketClick(event: MouseEvent): void {
 export function initMarket(): void {
   // MCP 市场按钮
   document.getElementById('open-mcp-market-btn')?.addEventListener('click', () => {
-    if (!state.currentAgentId) {
-      showError('请先连接一个 Agent');
-      return;
-    }
     document.getElementById('mcp-market-modal')?.classList.remove('hidden');
-    // 自动加载市场
+    // 自动加载市场（无需连接 Agent）
     void loadMcpMarket();
   });
 
@@ -594,6 +533,10 @@ export function initMarket(): void {
 
   // 刷新已安装的 MCP
   document.getElementById('refresh-installed-mcp-btn')?.addEventListener('click', () => {
+    if (!state.currentAgentId) {
+      showError('请先连接一个 Agent');
+      return;
+    }
     void loadInstalledMcp();
   });
 
@@ -602,12 +545,8 @@ export function initMarket(): void {
 
   // Agent 市场按钮
   document.getElementById('open-agent-market-btn')?.addEventListener('click', () => {
-    if (!state.currentAgentId) {
-      showError('请先连接一个 Agent');
-      return;
-    }
     document.getElementById('agent-market-modal')?.classList.remove('hidden');
-    // 自动加载市场
+    // 自动加载市场（无需连接 Agent）
     void loadAgentMarket();
   });
 
@@ -623,6 +562,10 @@ export function initMarket(): void {
 
   // 刷新已安装的 Agent
   document.getElementById('refresh-installed-agent-btn')?.addEventListener('click', () => {
+    if (!state.currentAgentId) {
+      showError('请先连接一个 Agent');
+      return;
+    }
     void loadInstalledAgents();
   });
 
@@ -655,6 +598,10 @@ export function initMarket(): void {
       if (tabName === 'mcp-market') {
         void loadMcpMarket();
       } else if (tabName === 'mcp-installed') {
+        if (!state.currentAgentId) {
+          showError('请先连接一个 Agent 以查看已安装的 MCP');
+          return;
+        }
         void loadInstalledMcp();
       }
     });
@@ -686,6 +633,10 @@ export function initMarket(): void {
       if (tabName === 'agent-market') {
         void loadAgentMarket();
       } else if (tabName === 'agent-installed') {
+        if (!state.currentAgentId) {
+          showError('请先连接一个 Agent 以查看已安装的 Agent');
+          return;
+        }
         void loadInstalledAgents();
       }
     });

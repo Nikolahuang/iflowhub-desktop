@@ -1,6 +1,6 @@
 use std::process::Stdio;
 
-use tauri::State;
+use tauri::{Manager, State};
 use tokio::process::{Child, Command};
 use tokio::time::{timeout, Duration};
 
@@ -604,4 +604,74 @@ pub async fn save_export_file(
         }
         None => Err("用户取消了保存".to_string()),
     }
+}
+
+/// 获取本地 MCP 市场数据
+#[tauri::command]
+pub fn get_local_mcp_market(app_handle: tauri::AppHandle) -> Result<crate::models::MarketResponse, String> {
+    // 尝试从资源目录读取 market-mcp.json
+    let resource_path = app_handle
+        .path()
+        .resource_dir()
+        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
+    
+    let market_file = resource_path.join("market-mcp.json");
+    
+    if !market_file.exists() {
+        // 如果文件不存在，返回空列表
+        return Ok(crate::models::MarketResponse {
+            success: true,
+            error: None,
+            items: Some(serde_json::json!([])),
+        });
+    }
+    
+    let content = std::fs::read_to_string(&market_file)
+        .map_err(|e| format!("Failed to read market file: {}", e))?;
+    
+    let json: serde_json::Value = serde_json::from_str(&content)
+        .map_err(|e| format!("Failed to parse market JSON: {}", e))?;
+    
+    let items = json.get("items").cloned().unwrap_or(serde_json::json!([]));
+    
+    Ok(crate::models::MarketResponse {
+        success: true,
+        error: None,
+        items: Some(items),
+    })
+}
+
+/// 获取本地 Agent 市场数据
+#[tauri::command]
+pub fn get_local_agent_market(app_handle: tauri::AppHandle) -> Result<crate::models::MarketResponse, String> {
+    // 尝试从资源目录读取 market-agents.json
+    let resource_path = app_handle
+        .path()
+        .resource_dir()
+        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
+    
+    let market_file = resource_path.join("market-agents.json");
+    
+    if !market_file.exists() {
+        // 如果文件不存在，返回空列表
+        return Ok(crate::models::MarketResponse {
+            success: true,
+            error: None,
+            items: Some(serde_json::json!([])),
+        });
+    }
+    
+    let content = std::fs::read_to_string(&market_file)
+        .map_err(|e| format!("Failed to read market file: {}", e))?;
+    
+    let json: serde_json::Value = serde_json::from_str(&content)
+        .map_err(|e| format!("Failed to parse market JSON: {}", e))?;
+    
+    let items = json.get("items").cloned().unwrap_or(serde_json::json!([]));
+    
+    Ok(crate::models::MarketResponse {
+        success: true,
+        error: None,
+        items: Some(items),
+    })
 }

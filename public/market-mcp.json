@@ -1,0 +1,126 @@
+{
+  "version": "1.0",
+  "updatedAt": "2026-03-16",
+  "items": [
+    {
+      "name": "filesystem",
+      "description": "文件系统操作工具，支持读写文件、创建目录、列出文件等操作",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "文件系统",
+      "tags": ["文件", "读写", "目录"]
+    },
+    {
+      "name": "memory",
+      "description": "内存存储工具，支持键值对存储和检索，用于会话间保持状态",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "存储",
+      "tags": ["内存", "存储", "状态"]
+    },
+    {
+      "name": "git",
+      "description": "Git 版本控制工具，支持提交、分支、合并等操作",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "版本控制",
+      "tags": ["git", "版本控制", "代码"]
+    },
+    {
+      "name": "postgres",
+      "description": "PostgreSQL 数据库连接工具，支持查询、插入、更新等操作",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "数据库",
+      "tags": ["数据库", "PostgreSQL", "SQL"]
+    },
+    {
+      "name": "sqlite",
+      "description": "SQLite 数据库操作工具，支持本地数据库管理",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "数据库",
+      "tags": ["数据库", "SQLite", "SQL"]
+    },
+    {
+      "name": "fetch",
+      "description": "HTTP 请求工具，支持 GET、POST、PUT、DELETE 等请求方法",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "网络",
+      "tags": ["HTTP", "API", "请求"]
+    },
+    {
+      "name": "brave-search",
+      "description": "Brave 搜索引擎工具，支持网络搜索和信息检索",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "搜索",
+      "tags": ["搜索", "网络", "信息检索"]
+    },
+    {
+      "name": "puppeteer",
+      "description": "浏览器自动化工具，支持网页截图、表单填写、数据抓取等",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "自动化",
+      "tags": ["浏览器", "自动化", "爬虫"]
+    },
+    {
+      "name": "slack",
+      "description": "Slack 集成工具，支持发送消息、读取频道等功能",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "通讯",
+      "tags": ["Slack", "消息", "通讯"]
+    },
+    {
+      "name": "github",
+      "description": "GitHub API 集成工具，支持仓库管理、Issue、PR 等操作",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "开发",
+      "tags": ["GitHub", "API", "代码管理"]
+    },
+    {
+      "name": "docker",
+      "description": "Docker 容器管理工具，支持容器创建、启动、停止等操作",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "容器",
+      "tags": ["Docker", "容器", "部署"]
+    },
+    {
+      "name": "aws-knowledge-base",
+      "description": "AWS 知识库工具，提供 AWS 服务文档和最佳实践",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "云服务",
+      "tags": ["AWS", "云服务", "文档"]
+    },
+    {
+      "name": "sequential-thinking",
+      "description": "顺序思维工具，帮助 AI 进行逐步推理和复杂问题解决",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "推理",
+      "tags": ["推理", "思维", "分析"]
+    },
+    {
+      "name": "pdf",
+      "description": "PDF 文档处理工具，支持 PDF 读取、转换、提取文本等操作",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "文档",
+      "tags": ["PDF", "文档", "转换"]
+    },
+    {
+      "name": "image",
+      "description": "图像处理工具，支持图像分析、格式转换、压缩等操作",
+      "version": "1.0.0",
+      "author": "iFlow",
+      "category": "媒体",
+      "tags": ["图像", "图片", "处理"]
+    }
+  ]
+}

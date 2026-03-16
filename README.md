@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Rust](https://img.shields.io/badge/Rust-1.70-000000?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.3.10-blue.svg?style=for-the-badge)](package.json)
+[![Version](https://img.shields.io/badge/version-0.3.11-blue.svg?style=for-the-badge)](package.json)
 
 **一个功能强大的多 Agent 桌面工作台，专注于 iFlow ACP 协议接入、历史会话管理与可视化交互**
 

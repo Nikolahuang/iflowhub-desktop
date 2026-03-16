@@ -3404,6 +3404,24 @@ body {
   margin-bottom: 4px;
 }
 
+.market-item-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.market-item-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(47, 129, 247, 0.1);
+  color: var(--accent-color);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
 .market-item-install-btn {
   padding: 8px 16px;
   background: var(--accent-color);

@@ -22,9 +22,9 @@ mod storage;
 
 use artifact::{read_html_artifact, resolve_html_artifact_path};
 use commands::{
-    browse_agent_market, browse_mcp_market, connect_iflow, disconnect_agent, install_agent, install_mcp,
-    list_installed_agents, list_installed_mcp, save_export_file, send_message, send_long_message, shutdown_all_agents,
-    stop_message, switch_agent_model, toggle_agent_think,
+    browse_agent_market, browse_mcp_market, connect_iflow, disconnect_agent, get_local_agent_market,
+    get_local_mcp_market, install_agent, install_mcp, list_installed_agents, list_installed_mcp, save_export_file,
+    send_message, send_long_message, shutdown_all_agents, stop_message, switch_agent_model, toggle_agent_think,
 };
 use dialog::pick_folder;
 use git::{list_git_changes, load_git_file_diff};
@@ -66,6 +66,8 @@ fn main() {
             install_agent,
             list_installed_agents,
             save_export_file,
+            get_local_mcp_market,
+            get_local_agent_market,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

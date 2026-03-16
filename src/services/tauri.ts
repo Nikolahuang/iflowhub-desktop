@@ -164,3 +164,12 @@ export function installAgent(agentId: string, name: string): Promise<InstallResp
 export function listInstalledAgents(agentId: string): Promise<MarketResponse> {
   return invoke<MarketResponse>('list_installed_agents', { agentId });
 }
+
+// 本地市场数据函数（从打包的 JSON 文件读取）
+export function getLocalMcpMarket(): Promise<MarketResponse> {
+  return invoke<MarketResponse>('get_local_mcp_market');
+}
+
+export function getLocalAgentMarket(): Promise<MarketResponse> {
+  return invoke<MarketResponse>('get_local_agent_market');
+}

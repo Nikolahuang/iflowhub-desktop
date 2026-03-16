@@ -1,0 +1,97 @@
+{
+  "version": "1.0",
+  "updatedAt": "2026-03-16",
+  "items": [
+    {
+      "name": "rust-pro",
+      "description": "Rust 专家智能体，精通所有权、生命周期、异步编程等高级特性，提供代码审查和优化建议",
+      "agentType": "specialist",
+      "category": "编程语言",
+      "tags": ["Rust", "系统编程", "性能优化"]
+    },
+    {
+      "name": "python-expert",
+      "description": "Python 专家智能体，擅长数据分析、机器学习、Web 开发等领域",
+      "agentType": "specialist",
+      "category": "编程语言",
+      "tags": ["Python", "数据分析", "机器学习"]
+    },
+    {
+      "name": "frontend-dev",
+      "description": "前端开发专家，精通 React、Vue、TypeScript 等现代前端技术栈",
+      "agentType": "specialist",
+      "category": "前端开发",
+      "tags": ["前端", "React", "Vue", "TypeScript"]
+    },
+    {
+      "name": "backend-dev",
+      "description": "后端开发专家，擅长微服务架构、数据库设计、API 开发",
+      "agentType": "specialist",
+      "category": "后端开发",
+      "tags": ["后端", "微服务", "API"]
+    },
+    {
+      "name": "devops",
+      "description": "DevOps 工程师，擅长 CI/CD、容器化、云原生部署",
+      "agentType": "specialist",
+      "category": "运维",
+      "tags": ["DevOps", "CI/CD", "Docker", "Kubernetes"]
+    },
+    {
+      "name": "security-expert",
+      "description": "安全专家，擅长漏洞分析、安全审计、渗透测试",
+      "agentType": "specialist",
+      "category": "安全",
+      "tags": ["安全", "漏洞", "审计"]
+    },
+    {
+      "name": "code-reviewer",
+      "description": "代码审查专家，提供代码质量、最佳实践、潜在问题的全面分析",
+      "agentType": "specialist",
+      "category": "代码质量",
+      "tags": ["代码审查", "质量", "最佳实践"]
+    },
+    {
+      "name": "technical-writer",
+      "description": "技术文档写作专家，擅长 API 文档、技术规范、用户手册编写",
+      "agentType": "specialist",
+      "category": "文档",
+      "tags": ["文档", "API", "技术写作"]
+    },
+    {
+      "name": "data-scientist",
+      "description": "数据科学家，擅长数据分析、可视化、机器学习模型构建",
+      "agentType": "specialist",
+      "category": "数据科学",
+      "tags": ["数据科学", "机器学习", "可视化"]
+    },
+    {
+      "name": "greeting-responder",
+      "description": "问候响应智能体，友好地回应用户的问候和简单交互",
+      "agentType": "assistant",
+      "category": "基础",
+      "tags": ["问候", "基础", "交互"]
+    },
+    {
+      "name": "plan-agent",
+      "description": "规划智能体，基于上下文规划实现步骤而不直接修改代码",
+      "agentType": "assistant",
+      "category": "规划",
+      "tags": ["规划", "分析", "设计"]
+    },
+    {
+      "name": "explore-agent",
+      "description": "探索智能体，用于探索和理解代码库结构而不做修改",
+      "agentType": "assistant",
+      "category": "探索",
+      "tags": ["探索", "分析", "代码库"]
+    },
+    {
+      "name": "general-purpose",
+      "description": "通用智能体，处理复杂的搜索、编码和多步骤任务",
+      "agentType": "assistant",
+      "category": "通用",
+      "tags": ["通用", "多任务", "复杂"]
+    }
+  ]
+}
