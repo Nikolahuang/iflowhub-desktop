@@ -683,7 +683,12 @@ export function initFavoritesStyles(): void {
       transform: translateX(-50%) translateY(0);
     }
 
-    /* 收藏按钮（添加到消息上） */
+    /* 消息容器需要相对定位 */
+    .message {
+      position: relative;
+    }
+
+    /* 收藏按钮 - 始终显示但半透明，悬停时完全显示 */
     .message-favorite-btn {
       position: absolute;
       top: 8px;
@@ -695,16 +700,13 @@ export function initFavoritesStyles(): void {
       background: var(--bg-tertiary);
       color: var(--text-secondary);
       cursor: pointer;
-      opacity: 0;
+      opacity: 0.3;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 14px;
-    }
-
-    .message-content {
-      position: relative;
+      z-index: 10;
     }
 
     .message:hover .message-favorite-btn {
@@ -714,15 +716,142 @@ export function initFavoritesStyles(): void {
     .message-favorite-btn:hover {
       background: var(--accent-color);
       color: white;
+      transform: scale(1.1);
     }
 
     .message-favorite-btn.favorited {
       opacity: 1;
       color: #fbbf24;
+      background: rgba(251, 191, 36, 0.2);
     }
 
     .message-favorite-btn.favorited:hover {
       color: white;
+      background: var(--accent-color);
+    }
+
+    /* 多选模式下的消息样式 */
+    .message.selectable {
+      cursor: pointer;
+    }
+
+    .message.selected {
+      background: rgba(47, 129, 247, 0.1);
+      border-left: 3px solid var(--accent-color);
+    }
+
+    .message.select-checkbox {
+      position: absolute;
+      left: -30px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--bg-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: transparent;
+      transition: all 0.2s;
+    }
+
+    .message.selected .select-checkbox {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: white;
+    }
+
+    /* 右键菜单样式 */
+    .message-context-menu {
+      position: fixed;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 4px 0;
+      min-width: 150px;
+      z-index: 1000;
+    }
+
+    .message-context-menu-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-primary);
+      transition: background 0.15s;
+    }
+
+    .message-context-menu-item:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .message-context-menu-item.danger {
+      color: #ef4444;
+    }
+
+    .message-context-menu-divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 4px 0;
+    }
+
+    /* 多选工具栏 */
+    .multi-select-toolbar {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .multi-select-toolbar .selected-count {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .multi-select-toolbar .btn-primary {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .multi-select-toolbar .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .multi-select-toolbar .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .multi-select-toolbar .btn-secondary:hover {
+      background: var(--bg-secondary);
     }
   `;
 

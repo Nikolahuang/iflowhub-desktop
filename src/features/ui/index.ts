@@ -854,13 +854,8 @@ export function renderMessages() {
         `;
       }
 
-      // 收藏按钮（只在 user 和 assistant 消息上显示）
-      const favoriteBtn = (msg.role === 'user' || msg.role === 'assistant')
-        ? `<button class="message-favorite-btn" data-message-id="${escapeHtml(msg.id)}" data-message-role="${msg.role}" data-message-content="${escapeHtml(msg.content.substring(0, 200))}" title="收藏此消息">⭐</button>`
-        : '';
-
       return `
-      <div class="message ${msg.role}">
+      <div class="message ${msg.role}" data-message-id="${escapeHtml(msg.id)}" data-message-role="${msg.role}">
         <div class="message-avatar">${avatar}</div>
         <div class="message-content">
           ${formatMessageContent(msg.content)}
@@ -868,48 +863,245 @@ export function renderMessages() {
           <div class="message-time">${formatTime(msg.timestamp)}</div>
           ${quickReplySection}
         </div>
-        ${favoriteBtn}
       </div>
     `;
       })
       .join('') + thinkingIndicator;
 
-  // 添加收藏按钮点击事件
-  chatMessagesEl.querySelectorAll('.message-favorite-btn').forEach((btn) => {
-    btn.addEventListener('click', async (e) => {
-      const target = e.currentTarget as HTMLElement;
-      const messageId = target.dataset.messageId || '';
-      const messageRole = target.dataset.messageRole || '';
+  // 添加消息选择和右键菜单事件
+  setupMessageSelection();
+}
+
+// 已选中的消息 ID 集合
+const selectedMessageIds = new Set<string>();
+let isSelectMode = false;
+
+// 设置消息选择功能
+function setupMessageSelection(): void {
+  // 消息点击事件（多选）
+  chatMessagesEl.querySelectorAll('.message').forEach((msgEl) => {
+    msgEl.addEventListener('click', (e) => {
+      if (!isSelectMode) return;
       
-      // 动态导入收藏管理器
-      const { favoritesManager } = await import('../favorites');
+      const target = e.target as HTMLElement;
+      // 忽略按钮点击
+      if (target.closest('button')) return;
       
-      // 获取完整消息内容
-      const msg = state.messages.find(m => m.id === messageId);
-      if (!msg) return;
+      const messageEl = target.closest('.message') as HTMLElement;
+      const messageId = messageEl?.dataset.messageId;
+      if (!messageId) return;
       
-      // 获取 agent 名称
-      const agent = state.agents.find(a => a.id === state.currentAgentId);
-      const agentName = agent?.name || 'Unknown';
+      // 切换选中状态
+      if (selectedMessageIds.has(messageId)) {
+        selectedMessageIds.delete(messageId);
+        messageEl.classList.remove('selected');
+      } else {
+        selectedMessageIds.add(messageId);
+        messageEl.classList.add('selected');
+      }
       
-      // 添加到收藏
-      const favorite = favoritesManager.add({
+      updateSelectionBar();
+    });
+    
+    // 右键菜单
+    msgEl.addEventListener('contextmenu', (e: Event) => {
+      e.preventDefault();
+      const mouseEvent = e as MouseEvent;
+      const messageEl = e.currentTarget as HTMLElement;
+      const messageId = messageEl.dataset.messageId || '';
+      const messageRole = messageEl.dataset.messageRole || '';
+      
+      // 只对 user 和 assistant 消息显示菜单
+      if (messageRole !== 'user' && messageRole !== 'assistant') return;
+      
+      showMessageContextMenu(mouseEvent, messageId);
+    });
+  });
+}
+
+// 显示消息右键菜单
+function showMessageContextMenu(e: MouseEvent, messageId: string): void {
+  // 移除已有菜单
+  document.querySelector('.message-context-menu')?.remove();
+  
+  const menu = document.createElement('div');
+  menu.className = 'message-context-menu';
+  menu.innerHTML = `
+    <div class="context-menu-item" data-action="favorite">
+      ⭐ 收藏此消息
+    </div>
+    <div class="context-menu-item" data-action="select">
+      ☑️ 多选模式
+    </div>
+    <div class="context-menu-item" data-action="copy">
+      📋 复制内容
+    </div>
+  `;
+  
+  // 定位菜单
+  menu.style.left = `${e.clientX}px`;
+  menu.style.top = `${e.clientY}px`;
+  document.body.appendChild(menu);
+  
+  // 点击其他地方关闭菜单
+  const closeMenu = () => {
+    menu.remove();
+    document.removeEventListener('click', closeMenu);
+  };
+  setTimeout(() => document.addEventListener('click', closeMenu), 10);
+  
+  // 菜单项点击
+  menu.querySelectorAll('.context-menu-item').forEach((item) => {
+    item.addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      const action = (item as HTMLElement).dataset.action;
+      
+      if (action === 'favorite') {
+        await addMessageToFavorite(messageId);
+      } else if (action === 'select') {
+        enableSelectMode();
+        // 选中当前消息
+        const msgEl = document.querySelector(`.message[data-message-id="${messageId}"]`);
+        if (msgEl) {
+          selectedMessageIds.add(messageId);
+          msgEl.classList.add('selected');
+        }
+        updateSelectionBar();
+      } else if (action === 'copy') {
+        const msg = state.messages.find(m => m.id === messageId);
+        if (msg) {
+          await navigator.clipboard.writeText(msg.content);
+        }
+      }
+      
+      closeMenu();
+    });
+  });
+}
+
+// 启用多选模式
+function enableSelectMode(): void {
+  isSelectMode = true;
+  chatMessagesEl.classList.add('select-mode');
+  
+  // 显示选择操作栏
+  showSelectionBar();
+}
+
+// 退出多选模式
+function exitSelectMode(): void {
+  isSelectMode = false;
+  chatMessagesEl.classList.remove('select-mode');
+  selectedMessageIds.clear();
+  
+  // 清除所有选中状态
+  chatMessagesEl.querySelectorAll('.message.selected').forEach((el) => {
+    el.classList.remove('selected');
+  });
+  
+  // 移除选择操作栏
+  document.querySelector('.message-selection-bar')?.remove();
+}
+
+// 显示选择操作栏
+function showSelectionBar(): void {
+  const existingBar = document.querySelector('.message-selection-bar');
+  if (existingBar) return;
+  
+  const bar = document.createElement('div');
+  bar.className = 'message-selection-bar';
+  bar.innerHTML = `
+    <div class="selection-info">
+      <span class="selection-count">已选择 0 条消息</span>
+    </div>
+    <div class="selection-actions">
+      <button class="btn-secondary selection-cancel">取消</button>
+      <button class="btn-primary selection-favorite">⭐ 收藏选中</button>
+    </div>
+  `;
+  
+  document.querySelector('.chat-container')?.appendChild(bar);
+  
+  // 取消按钮
+  bar.querySelector('.selection-cancel')?.addEventListener('click', exitSelectMode);
+  
+  // 收藏按钮
+  bar.querySelector('.selection-favorite')?.addEventListener('click', async () => {
+    await addSelectedMessagesToFavorite();
+    exitSelectMode();
+  });
+}
+
+// 更新选择操作栏
+function updateSelectionBar(): void {
+  const countEl = document.querySelector('.selection-count');
+  if (countEl) {
+    countEl.textContent = `已选择 ${selectedMessageIds.size} 条消息`;
+  }
+}
+
+// 添加单条消息到收藏
+async function addMessageToFavorite(messageId: string): Promise<void> {
+  const { favoritesManager } = await import('../favorites');
+  
+  const msg = state.messages.find(m => m.id === messageId);
+  if (!msg) return;
+  
+  const agent = state.agents.find(a => a.id === state.currentAgentId);
+  const agentName = agent?.name || 'Unknown';
+  
+  favoritesManager.add({
+    content: msg.content,
+    summary: msg.content.substring(0, 100),
+    messageType: msg.role as 'user' | 'assistant',
+    agentId: state.currentAgentId || '',
+    agentName,
+    tags: [],
+    sessionId: state.currentSessionId || '',
+  });
+  
+  showToast('已添加到收藏');
+}
+
+// 添加选中的多条消息到收藏
+async function addSelectedMessagesToFavorite(): Promise<void> {
+  const { favoritesManager } = await import('../favorites');
+  
+  const agent = state.agents.find(a => a.id === state.currentAgentId);
+  const agentName = agent?.name || 'Unknown';
+  
+  let count = 0;
+  selectedMessageIds.forEach((id) => {
+    const msg = state.messages.find(m => m.id === id);
+    if (msg && (msg.role === 'user' || msg.role === 'assistant')) {
+      favoritesManager.add({
         content: msg.content,
         summary: msg.content.substring(0, 100),
-        messageType: messageRole as 'user' | 'assistant',
+        messageType: msg.role as 'user' | 'assistant',
         agentId: state.currentAgentId || '',
         agentName,
         tags: [],
         sessionId: state.currentSessionId || '',
       });
-      
-      // 标记为已收藏
-      target.classList.add('favorited');
-      target.innerHTML = '★';
-      
-      console.log('Added to favorites:', favorite.id);
-    });
+      count++;
+    }
   });
+  
+  showToast(`已收藏 ${count} 条消息`);
+}
+
+// 显示提示
+function showToast(message: string): void {
+  const toast = document.createElement('div');
+  toast.className = 'favorite-toast';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => toast.classList.add('show'), 10);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 2000);
 }
 
 // 滚动到底部
