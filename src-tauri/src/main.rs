@@ -17,14 +17,16 @@ mod model_resolver;
 mod models;
 mod router;
 mod runtime_env;
+mod skills;
 mod state;
 mod storage;
 
 use artifact::{read_html_artifact, resolve_html_artifact_path};
 use commands::{
     browse_agent_market, browse_mcp_market, connect_iflow, disconnect_agent, get_local_agent_market,
-    get_local_mcp_market, install_agent, install_mcp, list_installed_agents, list_installed_mcp, save_export_file,
-    send_message, send_long_message, shutdown_all_agents, stop_message, switch_agent_model, toggle_agent_think,
+    get_local_mcp_market, get_popular_skills_cmd, install_agent, install_mcp, install_skill, list_installed_agents,
+    list_installed_mcp, list_installed_skills, save_export_file, search_skills, send_message, send_long_message,
+    shutdown_all_agents, stop_message, switch_agent_model, toggle_agent_think, uninstall_skill, upload_skill,
 };
 use dialog::pick_folder;
 use git::{list_git_changes, load_git_file_diff};
@@ -68,6 +70,13 @@ fn main() {
             save_export_file,
             get_local_mcp_market,
             get_local_agent_market,
+            // Skills 相关命令
+            search_skills,
+            list_installed_skills,
+            install_skill,
+            get_popular_skills_cmd,
+            upload_skill,
+            uninstall_skill,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

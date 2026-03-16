@@ -582,7 +582,7 @@ pub async fn list_installed_agents(state: State<'_, AppState>, agent_id: String)
 /// 保存导出文件
 #[tauri::command]
 pub async fn save_export_file(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     content: String,
     default_filename: String,
 ) -> Result<String, String> {
@@ -674,4 +674,126 @@ pub fn get_local_agent_market(app_handle: tauri::AppHandle) -> Result<crate::mod
         error: None,
         items: Some(items),
     })
+}
+
+// ==================== Skills 相关命令 ====================
+
+/// 搜索 Skills（从 GitHub）
+#[tauri::command]
+pub async fn search_skills(query: String) -> Result<crate::skills::SkillSearchResponse, String> {
+    let skills = if query.is_empty() {
+        // 如果查询为空，返回热门 Skills
+        crate::skills::get_popular_skills()
+    } else {
+        // 从 GitHub 搜索
+        match crate::skills::search_skills_from_github(&query).await {
+            Ok(skills) => skills,
+            Err(e) => {
+                return Ok(crate::skills::SkillSearchResponse {
+                    success: false,
+                    error: Some(e),
+                    items: None,
+                });
+            }
+        }
+    };
+
+    Ok(crate::skills::SkillSearchResponse {
+        success: true,
+        error: None,
+        items: Some(skills),
+    })
+}
+
+/// 获取已安装的 Skills
+#[tauri::command]
+pub fn list_installed_skills(workspace_path: String) -> Result<crate::skills::SkillSearchResponse, String> {
+    let skills = crate::skills::get_installed_skills(&workspace_path)?;
+
+    Ok(crate::skills::SkillSearchResponse {
+        success: true,
+        error: None,
+        items: Some(skills),
+    })
+}
+
+/// 安装 Skill
+#[tauri::command]
+pub async fn install_skill(
+    workspace_path: String,
+    repo_url: String,
+    skill_path: String,
+    skill_name: String,
+) -> Result<crate::skills::SkillInstallResponse, String> {
+    match crate::skills::install_skill_from_github(&workspace_path, &repo_url, &skill_path, &skill_name).await {
+        Ok(skill_path_result) => Ok(crate::skills::SkillInstallResponse {
+            success: true,
+            error: None,
+            message: Some(format!("Skill '{}' installed successfully", skill_name)),
+            skill_path: Some(skill_path_result),
+        }),
+        Err(e) => Ok(crate::skills::SkillInstallResponse {
+            success: false,
+            error: Some(e),
+            message: None,
+            skill_path: None,
+        }),
+    }
+}
+
+/// 获取热门 Skills
+#[tauri::command]
+pub fn get_popular_skills_cmd() -> Result<crate::skills::SkillSearchResponse, String> {
+    let skills = crate::skills::get_popular_skills();
+
+    Ok(crate::skills::SkillSearchResponse {
+        success: true,
+        error: None,
+        items: Some(skills),
+    })
+}
+
+/// 从本地上传安装 Skill
+#[tauri::command]
+pub fn upload_skill(
+    workspace_path: String,
+    skill_name: String,
+    content: String,
+) -> Result<crate::skills::SkillInstallResponse, String> {
+    match crate::skills::install_skill_from_local(&workspace_path, &skill_name, &content) {
+        Ok(skill_path) => Ok(crate::skills::SkillInstallResponse {
+            success: true,
+            error: None,
+            message: Some(format!("Skill '{}' installed successfully", skill_name)),
+            skill_path: Some(skill_path),
+        }),
+        Err(e) => Ok(crate::skills::SkillInstallResponse {
+            success: false,
+            error: Some(e),
+            message: None,
+            skill_path: None,
+        }),
+    }
+}
+
+/// 卸载已安装的 Skill
+#[tauri::command]
+pub fn uninstall_skill(
+    workspace_path: String,
+    skill_name: String,
+) -> Result<crate::skills::SkillInstallResponse, String> {
+    match crate::skills::uninstall_skill(&workspace_path, &skill_name) {
+        Ok(()) => Ok(crate::skills::SkillInstallResponse {
+            success: true,
+            error: None,
+            message: Some(format!("Skill '{}' uninstalled successfully", skill_name)),
+            skill_path: None,
+        }),
+        Err(e) => Ok(crate::skills::SkillInstallResponse {
+            success: false,
+            error: Some(e),
+            message: None,
+            skill_path: None,
+        }),
+    }
 }

@@ -9,6 +9,8 @@ import type {
   GitFileChange,
   MarketResponse,
   InstallResponse,
+  SkillSearchResponse,
+  SkillInstallResponse,
 } from '../types';
 
 export { convertFileSrc, getVersion };
@@ -172,4 +174,53 @@ export function getLocalMcpMarket(): Promise<MarketResponse> {
 
 export function getLocalAgentMarket(): Promise<MarketResponse> {
   return invoke<MarketResponse>('get_local_agent_market');
+}
+
+// Skills 市场相关函数
+export function searchSkills(query: string): Promise<SkillSearchResponse> {
+  return invoke<SkillSearchResponse>('search_skills', { query });
+}
+
+export function listInstalledSkills(workspacePath: string): Promise<SkillSearchResponse> {
+  return invoke<SkillSearchResponse>('list_installed_skills', { workspacePath });
+}
+
+export function installSkillApi(
+  workspacePath: string,
+  repoUrl: string,
+  skillPath: string,
+  skillName: string,
+): Promise<SkillInstallResponse> {
+  return invoke<SkillInstallResponse>('install_skill', {
+    workspacePath,
+    repoUrl,
+    skillPath,
+    skillName,
+  });
+}
+
+export function getPopularSkills(): Promise<SkillSearchResponse> {
+  return invoke<SkillSearchResponse>('get_popular_skills_cmd');
+}
+
+export function uploadSkill(
+  workspacePath: string,
+  skillName: string,
+  content: string,
+): Promise<SkillInstallResponse> {
+  return invoke<SkillInstallResponse>('upload_skill', {
+    workspacePath,
+    skillName,
+    content,
+  });
+}
+
+export function uninstallSkill(
+  workspacePath: string,
+  skillName: string,
+): Promise<SkillInstallResponse> {
+  return invoke<SkillInstallResponse>('uninstall_skill', {
+    workspacePath,
+    skillName,
+  });
 }

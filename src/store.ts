@@ -97,6 +97,12 @@ export const state = {
   // Agent 市场
   agentMarketItems: [] as import('./types').AgentMarketItem[],
   installedAgentItems: [] as import('./types').AgentMarketItem[],
+
+  // Skills 市场
+  skillItems: [] as import('./types').SkillItem[],
+  installedSkills: [] as import('./types').SkillItem[],
+  skillSearchQuery: '',
+  skillSearchResults: [] as import('./types').SkillItem[],
 };
 
 export function canUseConversationQuickAction(): boolean {

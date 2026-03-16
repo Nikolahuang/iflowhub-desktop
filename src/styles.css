@@ -3674,3 +3674,227 @@ body.has-background-image .toolbar {
 body.theme-light.has-background-image .toolbar {
   background-color: rgba(var(--toolbar-rgb, 246, 248, 250), var(--toolbar-bg-opacity, 0.5)) !important;
 }
+
+/* ==================== Skills 市场样式 ==================== */
+
+/* Skills 搜索框 */
+.skill-search-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.skill-search-input:focus {
+  border-color: var(--accent-color);
+}
+
+.skill-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Skill 标签 */
+.skill-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(47, 129, 247, 0.1);
+  color: var(--accent-color);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+body.theme-light .skill-tag {
+  background: rgba(47, 129, 247, 0.15);
+}
+
+/* Skill 操作按钮 */
+.skill-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.skill-repo-link {
+  display: inline-block;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--accent-color);
+  text-decoration: none;
+  border: 1px solid var(--accent-color);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.skill-repo-link:hover {
+  background: rgba(47, 129, 247, 0.1);
+}
+
+/* Skills 市场操作栏 */
+#skills-market-tab .market-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Skills 市场容器 */
+#skill-market-container,
+#installed-skills-container {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Skills 上传区域 */
+.skill-upload-section {
+  padding: 20px;
+}
+
+.upload-zone {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 40px 20px;
+  text-align: center;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--accent-color);
+  background: rgba(47, 129, 247, 0.05);
+}
+
+.upload-zone.dragover {
+  transform: scale(1.02);
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.upload-hint {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.upload-input {
+  display: none;
+}
+
+.upload-btn {
+  cursor: pointer;
+  padding: 10px 24px;
+}
+
+.upload-info {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.upload-info h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.upload-info ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* Skills 激活提示 */
+.skill-activation-hint {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(47, 129, 247, 0.08), rgba(34, 197, 94, 0.08));
+  border: 1px solid rgba(47, 129, 247, 0.2);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+}
+
+.skill-activation-hint .hint-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.skill-activation-hint .hint-content {
+  flex: 1;
+}
+
+.skill-activation-hint .hint-content strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.skill-activation-hint .hint-content p {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.skill-activation-hint .hint-highlight {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.skill-activation-hint .hint-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Skills market-empty 改进 */
+.market-empty-hint {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* 卸载按钮样式 */
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 12px;
+}

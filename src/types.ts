@@ -203,3 +203,30 @@ export interface InstallResponse {
   error?: string;
   message?: string;
 }
+
+// Skills 市场相关类型
+export interface SkillItem {
+  name: string;
+  description: string;
+  author?: string;
+  repository?: string;
+  repoUrl?: string;
+  path?: string;
+  category?: string;
+  installed: boolean;
+  stars?: number;
+  updatedAt?: string;
+}
+
+export interface SkillSearchResponse {
+  success: boolean;
+  error?: string;
+  items?: SkillItem[];
+}
+
+export interface SkillInstallResponse {
+  success: boolean;
+  error?: string;
+  message?: string;
+  skillPath?: string;
+}

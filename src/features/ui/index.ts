@@ -854,6 +854,11 @@ export function renderMessages() {
         `;
       }
 
+      // 收藏按钮（只在 user 和 assistant 消息上显示）
+      const favoriteBtn = (msg.role === 'user' || msg.role === 'assistant')
+        ? `<button class="message-favorite-btn" data-message-id="${escapeHtml(msg.id)}" data-message-role="${msg.role}" data-message-content="${escapeHtml(msg.content.substring(0, 200))}" title="收藏此消息">⭐</button>`
+        : '';
+
       return `
       <div class="message ${msg.role}">
         <div class="message-avatar">${avatar}</div>
@@ -863,10 +868,48 @@ export function renderMessages() {
           <div class="message-time">${formatTime(msg.timestamp)}</div>
           ${quickReplySection}
         </div>
+        ${favoriteBtn}
       </div>
     `;
       })
       .join('') + thinkingIndicator;
+
+  // 添加收藏按钮点击事件
+  chatMessagesEl.querySelectorAll('.message-favorite-btn').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const target = e.currentTarget as HTMLElement;
+      const messageId = target.dataset.messageId || '';
+      const messageRole = target.dataset.messageRole || '';
+      
+      // 动态导入收藏管理器
+      const { favoritesManager } = await import('../favorites');
+      
+      // 获取完整消息内容
+      const msg = state.messages.find(m => m.id === messageId);
+      if (!msg) return;
+      
+      // 获取 agent 名称
+      const agent = state.agents.find(a => a.id === state.currentAgentId);
+      const agentName = agent?.name || 'Unknown';
+      
+      // 添加到收藏
+      const favorite = favoritesManager.add({
+        content: msg.content,
+        summary: msg.content.substring(0, 100),
+        messageType: messageRole as 'user' | 'assistant',
+        agentId: state.currentAgentId || '',
+        agentName,
+        tags: [],
+        sessionId: state.currentSessionId || '',
+      });
+      
+      // 标记为已收藏
+      target.classList.add('favorited');
+      target.innerHTML = '★';
+      
+      console.log('Added to favorites:', favorite.id);
+    });
+  });
 }
 
 // 滚动到底部

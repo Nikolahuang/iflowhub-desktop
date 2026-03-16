@@ -67,6 +67,7 @@
             <button id="new-session-btn" class="btn-primary" disabled title="开启新会话，清除 iFlow 历史上下文">➕ 新会话</button>
             <button id="open-mcp-market-btn" class="btn-secondary" type="button" aria-label="打开 MCP 市场">🛒 MCP 市场</button>
             <button id="open-agent-market-btn" class="btn-secondary" type="button" aria-label="打开 Agent 市场">🤖 Agent 市场</button>
+            <button id="open-skills-market-btn" class="btn-secondary" type="button" aria-label="打开 Skills 市场">🎯 Skills</button>
             <button id="open-templates-btn" class="btn-secondary" type="button" aria-label="打开模板库">📚 模板库</button>
             <button id="open-favorites-btn" class="btn-secondary" type="button" aria-label="打开收藏夹">⭐ 收藏夹</button>
             <button id="open-branch-btn" class="btn-secondary" type="button" aria-label="打开对话分支">🌳 分支</button>
@@ -657,6 +658,60 @@
             </div>
             <div id="installed-agents-container" class="market-container">
               <div class="market-empty">点击刷新加载已安装的 Agent</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills 市场弹窗 -->
+    <div id="skills-market-modal" class="modal hidden">
+      <div class="modal-content market-modal-content">
+        <div class="modal-header">
+          <h3>🎯 Skills 市场</h3>
+          <button id="close-skills-market-modal" class="btn-icon" aria-label="关闭 Skills 市场">×</button>
+        </div>
+        <div class="modal-tabs">
+          <button class="modal-tab active" data-tab="skills-market">市场</button>
+          <button class="modal-tab" data-tab="skills-installed">已安装</button>
+          <button class="modal-tab" data-tab="skills-upload">上传</button>
+        </div>
+        <div class="modal-body market-modal-body">
+          <div class="market-tab-content active" id="skills-market-tab">
+            <div class="market-actions">
+              <input type="text" id="skill-search-input" class="skill-search-input" placeholder="搜索 Skills..." />
+              <button id="refresh-skills-market-btn" class="btn-secondary">搜索</button>
+            </div>
+            <div id="skill-market-container" class="market-container">
+              <div class="market-empty">点击搜索或加载热门 Skills</div>
+            </div>
+          </div>
+          <div class="market-tab-content" id="skills-installed-tab">
+            <div class="market-actions">
+              <button id="refresh-installed-skills-btn" class="btn-secondary">刷新</button>
+            </div>
+            <div id="installed-skills-container" class="market-container">
+              <div class="market-empty">点击刷新加载已安装的 Skills</div>
+            </div>
+          </div>
+          <div class="market-tab-content" id="skills-upload-tab">
+            <div class="skill-upload-section">
+              <div id="skill-upload-zone" class="upload-zone">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">拖拽 SKILL.md 文件到此处</div>
+                <div class="upload-hint">或点击下方按钮选择文件</div>
+                <input type="file" id="skill-upload-input" accept=".md" class="upload-input">
+                <label for="skill-upload-input" class="btn-primary upload-btn">选择文件</label>
+              </div>
+              <div class="upload-info">
+                <h4>上传说明</h4>
+                <ul>
+                  <li>支持 .md 格式的 Skills 文档</li>
+                  <li>文件应包含 YAML frontmatter（name, description 等）</li>
+                  <li>上传后 Skills 会自动集成到当前工作空间</li>
+                  <li>可在 Agent 设置中启用已安装的 Skills</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

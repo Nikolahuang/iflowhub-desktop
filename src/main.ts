@@ -25,6 +25,7 @@ import {
   updateContextIndicator 
 } from './features/enhancements';
 import { initMarket } from './features/market';
+import { initSkillsMarket } from './features/skills';
 
 async function init() {
   console.log('Initializing app...');
@@ -62,6 +63,9 @@ async function init() {
     
     // 初始化市场功能
     initMarket();
+    
+    // 初始化 Skills 市场功能
+    initSkillsMarket();
     
     // 初始化增强功能（上下文余量、权限模式、主题颜色）
     initEnhancementsStyles();
