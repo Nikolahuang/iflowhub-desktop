@@ -89,6 +89,13 @@ async fn spawn_iflow_agent(
         .stderr(Stdio::piped())
         .kill_on_drop(true);
 
+    // 在 Windows 上隐藏控制台窗口
+    #[cfg(target_os = "windows")]
+    {
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        unsafe { cmd.creation_flags(CREATE_NO_WINDOW); }
+    }
+
     if let Some(model_name) = model.as_ref() {
         let trimmed = model_name.trim();
         if !trimmed.is_empty() {

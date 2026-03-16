@@ -10,6 +10,17 @@ pub struct GitFileChange {
     pub unstaged_status: String,
 }
 
+/// 创建一个隐藏控制台窗口的 Command
+fn create_hidden_command(program: &str) -> Command {
+    let mut cmd = Command::new(program);
+    #[cfg(target_os = "windows")]
+    {
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        unsafe { cmd.creation_flags(CREATE_NO_WINDOW); }
+    }
+    cmd
+}
+
 fn status_code_to_label(code: char) -> &'static str {
     match code {
         'M' => "modified",
@@ -61,7 +72,7 @@ fn parse_status_line(line: &str) -> Option<GitFileChange> {
 async fn ensure_git_workspace(workspace_path: &str) -> Result<(), String> {
     let output = timeout(
         Duration::from_secs(8),
-        Command::new("git")
+        create_hidden_command("git")
             .arg("-C")
             .arg(workspace_path)
             .arg("rev-parse")
@@ -85,7 +96,7 @@ pub async fn list_git_changes(workspace_path: String) -> Result<Vec<GitFileChang
 
     let output = timeout(
         Duration::from_secs(10),
-        Command::new("git")
+        create_hidden_command("git")
             .arg("-C")
             .arg(&workspace_path)
             .arg("status")
@@ -125,7 +136,7 @@ pub async fn load_git_file_diff(
 
     let staged_output = timeout(
         Duration::from_secs(10),
-        Command::new("git")
+        create_hidden_command("git")
             .arg("-C")
             .arg(&workspace_path)
             .arg("diff")
@@ -151,7 +162,7 @@ pub async fn load_git_file_diff(
 
     let unstaged_output = timeout(
         Duration::from_secs(10),
-        Command::new("git")
+        create_hidden_command("git")
             .arg("-C")
             .arg(&workspace_path)
             .arg("diff")
